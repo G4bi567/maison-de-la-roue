@@ -387,12 +387,6 @@ function applyLiarState(s) {
     const wasMyShoot = prev.shooter === myId && prev.phase === 'shooting';
     const isMyShoot = s.shooter === myId && s.phase === 'shooting';
     if (!wasMyShoot && isMyShoot) buzz([100, 60, 100, 60, 200]);
-    // Turn change buzz (only on playing phase)
-    const aliveOrder = (s.order||[]).filter(id => s.players[id] && !s.players[id].eliminated);
-    const currentId = aliveOrder.length ? aliveOrder[s.turnIdx % aliveOrder.length] : null;
-    const prevAlive = (prev.order||[]).filter(id => prev.players[id] && !prev.players[id].eliminated);
-    const prevId = prevAlive.length ? prevAlive[prev.turnIdx % prevAlive.length] : null;
-    if (s.phase === 'playing' && currentId === myId && prevId !== myId) buzz(180);
   }
   liarState = s;
   renderLiar();
@@ -477,7 +471,7 @@ function renderLiar() {
 
   // Determine whose turn (skip eliminated)
   const aliveOrder = (s.order||[]).filter(id => s.players[id] && !s.players[id].eliminated);
-  const currentId = aliveOrder.length ? aliveOrder[s.turnIdx % aliveOrder.length] : null;
+  const currentId = aliveOrder.length ? aliveOrder[0] : null;
   const isMyTurn = currentId === myId;
 
   // SHOOTING phase
@@ -723,14 +717,16 @@ function renderPlayerList() {
   if (!liarState) return '';
   const s = liarState;
   const aliveOrder = (s.order||[]).filter(id => s.players[id] && !s.players[id].eliminated);
-  const currentId = aliveOrder.length ? aliveOrder[s.turnIdx % aliveOrder.length] : null;
+  const currentId = aliveOrder.length ? aliveOrder[0] : null;
   const items = Object.keys(s.players).map(id => {
     const p = s.players[id]; if (!p) return '';
-    const isTurn = id === currentId && (s.phase==='playing'||s.phase==='reveal');
     const elim = p.eliminated;
-    return `<div class="loser-pick-btn" style="cursor:default;${isTurn?'border-color:'+p.color:''};${elim?'opacity:.4;filter:grayscale(.7)':''}">
+    const chambers = p.revolver ? p.revolver.chambers : 6;
+    return `<div class="loser-pick-btn" style="cursor:default;${elim?'opacity:.4;filter:grayscale(.7)':''}">
       <span class="dot" style="background:${p.color};color:${p.color}"></span>
       <div style="flex:1">${escapeHtml(p.name)}${elim?' 💀':''}</div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#ff6170">🔫 1/${chambers}</div>
+    </div>`;
     </div>`;
   }).join('');
   return `<div style="margin-top:14px;"><div class="section-title">${t('disp.players_at')}</div><div class="loser-list">${items}</div></div>`;
