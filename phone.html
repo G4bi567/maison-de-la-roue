@@ -218,10 +218,12 @@ if (!myId) { myId = 'p_' + Math.random().toString(36).slice(2,10) + Date.now().t
 const $ = s => document.querySelector(s);
 const RED = new Set([1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36]);
 
-// Build number grid
+// Build number grid — guard against null
 const grid = $('#num-grid');
-grid.innerHTML = `<button class="num-btn green" data-num="0">0</button>` + 
-  Array.from({length:36},(_,i)=>i+1).map(n=>`<button class="num-btn ${RED.has(n)?'red':''}" data-num="${n}">${n}</button>`).join('');
+if (grid) {
+  grid.innerHTML = `<button class="num-btn green" data-num="0">0</button>` +
+    Array.from({length:36},(_,i)=>i+1).map(n=>`<button class="num-btn ${RED.has(n)?'red':''}" data-num="${n}">${n}</button>`).join('');
+}
 
 let ws = null;
 let state = null;     // roulette state
@@ -249,8 +251,10 @@ renderAvatarPicker();
 function buzz(ms) { try { if (navigator.vibrate) navigator.vibrate(ms || 200); } catch(e){} }
 
 // ============== JOIN ==============
-$('#join-btn').addEventListener('click', joinTable);
-$('#join-name').addEventListener('keydown', e => { if (e.key === 'Enter') joinTable(); });
+const joinBtn = $('#join-btn');
+const joinName = $('#join-name');
+if (joinBtn) joinBtn.addEventListener('click', joinTable);
+if (joinName) joinName.addEventListener('keydown', e => { if (e.key === 'Enter') joinTable(); });
 
 function joinTable() {
   const name = $('#join-name').value.trim();
