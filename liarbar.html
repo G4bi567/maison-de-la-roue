@@ -117,7 +117,7 @@ h3.section{font-family:"JetBrains Mono",monospace;font-size:10px;font-weight:800
 
 <div class="stage">
   <div class="center">
-    <div class="rank-box">
+    <div class="rank-box" style="display:none">
       <div class="rank-tag" data-i18n="liar.current_rank">Carte à annoncer</div>
       <div class="rank-name" id="current-rank">—</div>
     </div>
@@ -229,9 +229,19 @@ function placeChambers(total, bulletIdx) {
 function applyState(s) {
   state = s;
   const phase = s.phase;
+  const prevPhase = window._lastPhase;
+
+  // Start/stop hidden countdown
+  if (phase === 'shooting' && prevPhase !== 'shooting') {
+    unlockAudio();  // ensure audio is unlocked the moment shooting starts
+    startHiddenCountdown();
+  } else if (phase !== 'shooting') {
+    stopHiddenCountdown();
+  }
+
   const badge = document.getElementById('phase-badge');
-  badge.className = 'badge ' + (phase==='shooting' ? 'shooting' : phase==='playing' ? 'playing' : phase==='reveal' ? 'reveal' : '');
-  const phaseTexts = { lobby:t('liar.lobby.title'), playing:'IN PLAY', reveal:t('liar.bluff').replace('⚡',''), shooting:t('liar.revolver'), ended:t('liar.game_over') };
+  badge.className = 'badge ' + (phase==='shooting' ? 'shooting' : phase==='playing' ? 'playing' : '');
+  const phaseTexts = { lobby:t('liar.lobby.title'), playing:'IN PLAY', shooting:t('liar.revolver'), ended:t('liar.game_over') };
   badge.textContent = phaseTexts[phase] || phase.toUpperCase();
 
   document.getElementById('lobby-overlay').style.display = phase==='lobby' ? 'flex' : 'none';
@@ -379,6 +389,55 @@ function showTriggerResult(msg) {
 }
 
 document.addEventListener('langchange', () => { if (state) applyState(state); });
+
+// ── Audio unlock (browser blocks Web Audio until first user gesture) ──
+// On a TV nobody clicks, so we unlock on ANY touch/click/key
+let _audioUnlocked = false;
+function unlockAudio() {
+  if (_audioUnlocked) return;
+  _audioUnlocked = true;
+  try {
+    // Force AudioContext to start by playing a silent sound
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    gain.gain.value = 0;
+    osc.connect(gain).connect(ctx.destination);
+    osc.start(); osc.stop(ctx.currentTime + 0.001);
+    ctx.resume();
+  } catch(e) {}
+}
+['click','touchstart','keydown','mousedown'].forEach(ev =>
+  document.addEventListener(ev, unlockAudio, { once: true, capture: true })
+);
+
+// ── Hidden countdown: stress heartbeat that starts when shooting begins ──
+// No visible timer — just audio tension. Heartbeat speeds up over 10s.
+let _countdownTimer = null;
+let _countdownStart = 0;
+const COUNTDOWN_TOTAL = 10000;  // 10s hidden max
+
+function startHiddenCountdown() {
+  stopHiddenCountdown();
+  _countdownStart = Date.now();
+  let lastBeat = 0;
+  _countdownTimer = setInterval(() => {
+    const elapsed = Date.now() - _countdownStart;
+    if (elapsed >= COUNTDOWN_TOTAL) { stopHiddenCountdown(); return; }
+    const progress = elapsed / COUNTDOWN_TOTAL;  // 0 → 1
+    // BPM 60→160: interval 1000ms → 375ms
+    const interval = 1000 - progress * 625;
+    if (Date.now() - lastBeat > interval) {
+      lastBeat = Date.now();
+      try { SFX.heartbeat(); } catch(e) {}
+    }
+  }, 80);
+}
+
+function stopHiddenCountdown() {
+  if (_countdownTimer) { clearInterval(_countdownTimer); _countdownTimer = null; }
+}
+
 connect();
 </script>
 </body>

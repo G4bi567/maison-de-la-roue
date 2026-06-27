@@ -652,94 +652,33 @@ function renderLiar() {
     }, 100);
   }
 
-  // REVEAL phase: lastPlay shown + believe/bluff buttons
-  if (phase === 'reveal' && s.lastPlay) {
-    const isResponder = currentId === myId;  // next player after the play
-    const playerWhoPlayed = s.players[s.lastPlay.by];
-    let body = `
-      <div class="liar-info">
-        <div class="liar-label" data-i18n="liar.current_rank">Current rank</div>
-        <div class="liar-rank">${s.currentRank || '—'}</div>
-      </div>
-      <div class="liar-status">
-        <div style="font-family:'Bodoni Moda';font-style:italic;font-size:15px;color:var(--ink);margin-bottom:4px;">
-          ${escapeHtml(playerWhoPlayed ? playerWhoPlayed.name : '')} ${t('liar.table_says')} ${s.lastPlay.count}× ${s.currentRank}
-        </div>
-      </div>
-    `;
-    if (isResponder) {
-      body += `
-        <div class="btn-row">
-          <button class="btn-believe" id="btn-believe">${t('liar.believe')}</button>
-          <button class="btn-bluff" id="btn-bluff">${t('liar.bluff')}</button>
-        </div>
-      `;
-    } else {
-      const responderName = s.players[currentId]?.name || '—';
-      body += `<div class="liar-status">${t('liar.waiting')}: ${escapeHtml(responderName)}</div>`;
-    }
-    c.innerHTML = body + renderPlayerList();
-    const bb = $('#btn-believe'); if (bb) bb.addEventListener('click', () => ws.send(JSON.stringify({type:'liar-believe'})));
-    const bl = $('#btn-bluff');   if (bl) bl.addEventListener('click', () => ws.send(JSON.stringify({type:'liar-bluff'})));
-    return;
-  }
-
-  // PLAYING phase
+  // PLAYING phase — just card type + chambers + LIAR buttons
   if (phase === 'playing') {
-    // Are we choosing a loser? (after bluff revealed) — server sets phase='who_lost' but we use a flag
-    // Actually let's check: if state.needLoserPick is true, show pick list
-    if (s.needLoserPick) {
-      const picks = aliveOrder.map(id => {
-        const p = s.players[id];
-        return `<button class="loser-pick-btn" data-target="${id}"><span class="dot" style="background:${p.color};color:${p.color}"></span>${escapeHtml(p.name)}</button>`;
-      }).join('');
-      c.innerHTML = `
-        <div class="liar-info"><div class="liar-label">${t('liar.who_lost')}</div></div>
-        <div class="loser-pick-title">${t('liar.who_lost')}</div>
-        <div class="loser-pick-sub">${t('liar.who_lost_sub')}</div>
-        <div class="loser-list">${picks}</div>
-      `;
-      document.querySelectorAll('.loser-pick-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-          if (confirm(btn.textContent.trim() + ' ?')) {
-            ws.send(JSON.stringify({type:'liar-declare-loser', target: btn.dataset.target}));
-          }
-        });
-      });
-      return;
-    }
+    const alive = Object.entries(s.players).filter(([,p]) => !p.eliminated);
+    const others = alive.filter(([id]) => id !== myId);
 
-    let body = `
-      <div class="liar-info">
-        <div class="liar-label" data-i18n="liar.current_rank">Current rank</div>
-        <div class="liar-rank">${s.currentRank || '—'}</div>
+    c.innerHTML = `
+      <div style="text-align:center;padding:18px 0 20px;border-bottom:1px solid var(--line);margin-bottom:18px">
+        <div style="font-size:11px;font-family:'JetBrains Mono',monospace;letter-spacing:.5em;color:var(--ink-dim);text-transform:uppercase;margin-bottom:10px" data-i18n="liar.card_to_play">Carte à jouer</div>
+        <div style="font-size:64px;font-weight:900;font-style:italic;color:var(--purpleb);text-shadow:0 0 30px rgba(157,79,212,.5);line-height:1">${s.currentRank || '—'}</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:14px;color:#ff6170;margin-top:12px;letter-spacing:.3em">🔫 ${s.chambers || 6} ${t('liar.chambers_left')}</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:14px">
+        ${others.map(([id, p]) => `
+          <button class="btn-bluff liar-call-btn" data-target="${id}" style="display:flex;align-items:center;gap:14px;padding:20px;font-size:16px;border-radius:12px">
+            <span style="font-size:26px">${p.avatar||'🎩'}</span>
+            <span style="flex:1;text-align:left;font-weight:700">${escapeHtml(p.name)}</span>
+            <span style="font-weight:900;letter-spacing:.15em;color:#fff">🚨 LIAR!</span>
+          </button>
+        `).join('')}
       </div>
     `;
-    if (isMyTurn) {
-      body += `
-        <div class="liar-status your-turn">${t('liar.your_turn')}</div>
-        <div class="section-title" style="text-align:center;color:var(--purpleb)">${t('liar.tap_count')}</div>
-        <div class="card-count-row">
-          ${[1,2,3,4].map(n=>`<button class="cc-btn ${n===liarSelectedCount?'active':''}" data-cnt="${n}">${n}</button>`).join('')}
-        </div>
-        <button class="btn-play" id="btn-play">${t('liar.play_n').replace('%N%', liarSelectedCount)}</button>
-      `;
-    } else {
-      const tname = s.players[currentId]?.name || '—';
-      body += `<div class="liar-status">${t('liar.waiting')}: ${escapeHtml(tname)}</div>`;
-    }
-    c.innerHTML = body + renderPlayerList();
-    document.querySelectorAll('.cc-btn').forEach(b => {
-      b.addEventListener('click', () => {
-        liarSelectedCount = parseInt(b.dataset.cnt);
-        document.querySelectorAll('.cc-btn').forEach(x => x.classList.remove('active'));
-        b.classList.add('active');
-        $('#btn-play').textContent = t('liar.play_n').replace('%N%', liarSelectedCount);
+
+    document.querySelectorAll('.liar-call-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        btn.disabled = true; btn.style.opacity = .4;
+        ws.send(JSON.stringify({type:'liar-bluff', target: btn.dataset.target}));
       });
-    });
-    const bp = $('#btn-play');
-    if (bp) bp.addEventListener('click', () => {
-      ws.send(JSON.stringify({type:'liar-play', count: liarSelectedCount}));
     });
     return;
   }

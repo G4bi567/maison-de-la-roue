@@ -590,7 +590,7 @@ function onMessage(sock, msg) {
     case 'liar-start':          handleLiarStart(); break;
     case 'liar-play':           handleLiarPlay(sock, msg); break;
     case 'liar-believe':        handleLiarBelieve(sock); break;
-    case 'liar-bluff':          handleLiarBluff(sock); break;
+    case 'liar-bluff':          handleLiarBluff(sock, msg); break;
     case 'liar-declare-loser':  handleLiarDeclareLoser(msg); break;
     case 'liar-pull-trigger':   handleLiarPullTrigger(sock); break;
     case 'liar-reset':          resetLiarGame(); break;
@@ -760,6 +760,7 @@ function handleLiarStart() {
 }
 
 function handleLiarPlay(sock, msg) {
+  // "Done playing" — just advance the turn. Cards are physical, we don't track them.
   const info = clients.get(sock); if (!info || !info.id) return;
   if (liarState.phase !== 'playing') return;
   if (liarState.needLoserPick) return;
@@ -767,42 +768,48 @@ function handleLiarPlay(sock, msg) {
   if (!aliveOrder.length) return;
   const currentId = aliveOrder[liarState.turnIdx % aliveOrder.length];
   if (info.id !== currentId) return;
-  const count = Math.max(1, Math.min(4, parseInt(msg.count) || 1));
-  liarState.lastPlay = { by: info.id, count };
-  liarState.phase = 'reveal';
-  // advance turnIdx so the "next" player is the responder
+  // Advance turn
   liarState.turnIdx = (liarState.turnIdx + 1) % aliveOrder.length;
-  liarState.log.push({ key:'liar.log.play', vars:{ P: liarState.players[info.id].name, N: count, R: liarState.currentRank } });
+  liarState.lastPlay = null;
+  liarState.log.push({ key:'liar.log.played', vars:{ P: liarState.players[info.id].name } });
   if (liarState.log.length > 30) liarState.log.shift();
   broadcastLiarState();
 }
 
 function handleLiarBelieve(sock) {
+  // Keep for backwards compat but no longer used in simplified flow
   const info = clients.get(sock); if (!info || !info.id) return;
-  if (liarState.phase !== 'reveal') return;
-  const aliveOrder = liarState.order.filter(id => !liarState.players[id].eliminated);
-  const currentId = aliveOrder[liarState.turnIdx % aliveOrder.length];
-  if (info.id !== currentId) return;
-  // believe: turn moves on, lastPlay cleared, same rank stays
-  liarState.log.push({ key:'liar.log.believe', vars:{ P: liarState.players[info.id].name } });
-  if (liarState.log.length > 30) liarState.log.shift();
-  liarState.lastPlay = null;
-  liarState.phase = 'playing';
+  if (liarState.phase !== 'playing') return;
   broadcastLiarState();
 }
 
-function handleLiarBluff(sock) {
+function handleLiarBluff(sock, msg) {
   const info = clients.get(sock); if (!info || !info.id) return;
-  if (liarState.phase !== 'reveal') return;
-  const aliveOrder = liarState.order.filter(id => !liarState.players[id].eliminated);
-  const currentId = aliveOrder[liarState.turnIdx % aliveOrder.length];
-  if (info.id !== currentId) return;
-  // Bluff called → players check the physical cards & decide loser
-  liarState.log.push({ key:'liar.log.bluff', vars:{ P: liarState.players[info.id].name } });
+  if (liarState.phase !== 'playing') return;
+  if (liarState.needLoserPick) return;  // already picking
+  const caller = liarState.players[info.id];
+  if (!caller || caller.eliminated) return;
+  // Direct target supplied — skip loser-pick screen
+  const target = msg && msg.target ? String(msg.target) : null;
+  liarState.log.push({ key:'liar.log.bluff', vars:{ P: caller.name } });
   if (liarState.log.length > 30) liarState.log.shift();
-  liarState.phase = 'playing';
-  liarState.needLoserPick = true;   // phones show loser-picker
-  liarState.lastPlay = null;
+  if (target && liarState.players[target] && !liarState.players[target].eliminated) {
+    // Immediately go to shooting — no loser-pick needed
+    liarState.phase = 'shooting';
+    liarState.shooter = target;
+    liarState.needLoserPick = false;
+    liarState.lastPlay = null;
+    const p = liarState.players[target];
+    liarState.chambers = liarState._roundChambers || 6;
+    liarState.bulletIdx = Math.floor(Math.random() * liarState.chambers);
+    liarState.log.push({ key:'liar.log.lost', vars:{ P: p.name } });
+    if (liarState.log.length > 30) liarState.log.shift();
+  } else {
+    // Fallback: show loser-pick
+    liarState.phase = 'playing';
+    liarState.needLoserPick = true;
+    liarState.lastPlay = null;
+  }
   broadcastLiarState();
 }
 

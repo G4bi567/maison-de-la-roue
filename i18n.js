@@ -291,7 +291,13 @@ const TRANSLATIONS = {
   // gameplay UI
   'liar.current_rank':  { fr:'Rang à annoncer',    en:'Current rank',     pt:'Carta atual' },
   'liar.turn':          { fr:'À jouer',            en:"Whose turn",       pt:'Vez de' },
-  'liar.your_turn':     { fr:'À VOUS DE JOUER',    en:'YOUR TURN',        pt:'É A SUA VEZ' },
+  'liar.your_turn':        { fr:'C\'est ton tour !',   en:'Your turn!',         pt:'É a tua vez!' },
+  'liar.card_to_play':  { fr:'Carte à jouer',      en:'Card to play',     pt:'Carta a jogar' },
+  'liar.chambers_left': { fr:'chambres restantes', en:'chambers left',    pt:'câmaras restantes' },
+  'liar.done_playing':     { fr:'✅  J\'ai joué',       en:'✅  Done playing',    pt:'✅  Joguei' },
+  'liar.playing_now':      { fr:'EN TRAIN DE JOUER',   en:'NOW PLAYING',        pt:'A JOGAR AGORA' },
+  'liar.call_liar_anytime':{ fr:'Crie LIAR sur n\'importe qui, n\'importe quand', en:'Call LIAR on anyone, anytime', pt:'Chama LIAR a qualquer um, a qualquer momento' },
+  'liar.play_n':           { fr:'Jouer %N% carte(s)',  en:'Play %N% card(s)',   pt:'Jogar %N% carta(s)' },
   'liar.tap_count':     { fr:'Combien de cartes posez-vous ?', en:'How many cards are you playing?', pt:'Quantas cartas vai jogar?' },
   'liar.play_n':        { fr:'Jouer %N% carte(s)',  en:'Play %N% card(s)', pt:'Jogar %N% carta(s)' },
   'liar.waiting':       { fr:'En attente de',      en:'Waiting for',      pt:'À espera de' },
@@ -326,9 +332,10 @@ const TRANSLATIONS = {
 
   // log lines (server uses keys with placeholders)
   'liar.log.start':     { fr:'Partie démarrée ! Premier rang : %R%', en:'Game started! First rank: %R%', pt:'Jogo começou! Primeira carta: %R%' },
+  'liar.log.played':    { fr:'%P% a joué ses cartes', en:'%P% played their cards', pt:'%P% jogou as cartas' },
   'liar.log.play':      { fr:'%P% joue %N% carte(s) — annonce %N%× %R%', en:'%P% plays %N% card(s) — claims %N%× %R%', pt:'%P% joga %N% carta(s) — declara %N%× %R%' },
   'liar.log.believe':   { fr:'%P% croit — au tour suivant !', en:'%P% believes — next turn!', pt:'%P% acredita — próxima vez!' },
-  'liar.log.bluff':     { fr:'%P% crie BLUFF !', en:'%P% calls BLUFF!', pt:'%P% grita BLUFF!' },
+  'liar.log.bluff':     { fr:'%P% crie LIAR sur %P2% !', en:'%P% calls LIAR on %P2%!', pt:'%P% grita LIAR a %P2%!' },
   'liar.log.lost':      { fr:'%P% a perdu la manche et doit tirer', en:'%P% lost the round and must shoot', pt:'%P% perdeu a ronda e tem de disparar' },
   'liar.log.click':     { fr:'CLIC ! %P% est en vie.', en:'CLICK! %P% is alive.', pt:'CLIQUE! %P% está vivo.' },
   'liar.log.bang':      { fr:'💀 BANG ! %P% est éliminé.', en:'💀 BANG! %P% is eliminated.', pt:'💀 BANG! %P% foi eliminado.' },
