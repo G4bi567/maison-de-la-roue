@@ -40,22 +40,26 @@ const rouletteState = {
 };
 
 const liarState = {
-  phase: 'lobby',      // lobby | playing | reveal | shooting | ended
-  players: {},         // id -> { name, color, eliminated }
-  order: [],           // ordered list of player IDs
-  turnIdx: 0,          // index into alive-filtered order
-  currentRank: null,   // 'A' | 'K' | 'Q' | 'J'
-  lastPlay: null,      // { by, count }
-  shooter: null,       // id of player who must pull trigger
-  chambers: 6,         // current revolver chambers
-  bulletIdx: 0,        // 0..chambers-1
-  needLoserPick: false,// flag: phase=playing but waiting for loser declaration
-  round: 1,            // round counter
-  log: [],             // [{ key, vars }]
+  phase: 'lobby',      // lobby | playing | shooting | ended
+  players: {},         // id -> { name, avatar, color, eliminated, revolver: { chambers, bulletIdx } }
+  order: [],
+  currentRank: null,
+  shooter: null,
+  needLoserPick: false,
+  round: 1,
+  log: [],
 };
 
-const RANKS = ['A','K','Q','J'];
-const RANK_NAMES = { A:'Ace', K:'King', Q:'Queen', J:'Jack' };
+// Give a fresh 6-chamber revolver to a player
+function newRevolver() { return { chambers: 6, bulletIdx: Math.floor(Math.random() * 6) }; }
+// After surviving a shot: remove one chamber (same bullet stays, now 1/5, 1/4...)
+function survivedRevolver(rev) {
+  const chambers = Math.max(2, rev.chambers - 1);
+  return { chambers, bulletIdx: Math.floor(Math.random() * chambers) };
+}
+
+const RANKS = ['♠ Pique', '♣ Trèfle', '♥ Cœur', '♦ Carreau'];
+const RANK_NAMES = { '🔴 Rouge': 'Rouge', '⚫ Noir': 'Noir' };
 
 // ═══════════════════════════════════════════════════════════════════
 //  Mini-games (Slot, Lucky Number, War)
@@ -738,7 +742,7 @@ function handleLiarJoin(sock, msg) {
   if (!liarState.players[id]) {
     const color = rouletteState.players[id]?.color || PLAYER_COLORS[colorCursor++ % PLAYER_COLORS.length];
     const avatar = rouletteState.players[id]?.avatar || '🎩';
-    liarState.players[id] = { name, avatar, color, eliminated: false };
+    liarState.players[id] = { name, avatar, color, eliminated: false, revolver: newRevolver() };
     liarState.order.push(id);
   }
   broadcastLiarState();
@@ -748,11 +752,14 @@ function handleLiarStart() {
   if (liarState.phase !== 'lobby') return;
   const playerIds = Object.keys(liarState.players);
   if (playerIds.length < 2) return;
+  // Give each player a fresh revolver at game start
+  for (const id of playerIds) {
+    liarState.players[id].revolver = newRevolver();
+    liarState.players[id].eliminated = false;
+  }
   liarState.phase = 'playing';
-  liarState.turnIdx = 0;
   liarState.round = 1;
   liarState.currentRank = RANKS[Math.floor(Math.random() * RANKS.length)];
-  liarState.lastPlay = null;
   liarState.shooter = null;
   liarState.needLoserPick = false;
   liarState.log = [{ key:'liar.log.start', vars:{ R: liarState.currentRank } }];
@@ -786,30 +793,17 @@ function handleLiarBelieve(sock) {
 function handleLiarBluff(sock, msg) {
   const info = clients.get(sock); if (!info || !info.id) return;
   if (liarState.phase !== 'playing') return;
-  if (liarState.needLoserPick) return;  // already picking
+  if (liarState.needLoserPick) return;
   const caller = liarState.players[info.id];
   if (!caller || caller.eliminated) return;
-  // Direct target supplied — skip loser-pick screen
   const target = msg && msg.target ? String(msg.target) : null;
-  liarState.log.push({ key:'liar.log.bluff', vars:{ P: caller.name } });
+  if (!target || !liarState.players[target] || liarState.players[target].eliminated) return;
+  // Store who accused whom — now everyone flips cards physically
+  // and someone taps who shoots (caller if wrong, target if caught lying)
+  liarState.liarpick = { callerId: info.id, targetId: target };
+  liarState.needLoserPick = true;
+  liarState.log.push({ key:'liar.log.bluff', vars:{ P: caller.name, T: liarState.players[target].name } });
   if (liarState.log.length > 30) liarState.log.shift();
-  if (target && liarState.players[target] && !liarState.players[target].eliminated) {
-    // Immediately go to shooting — no loser-pick needed
-    liarState.phase = 'shooting';
-    liarState.shooter = target;
-    liarState.needLoserPick = false;
-    liarState.lastPlay = null;
-    const p = liarState.players[target];
-    liarState.chambers = liarState._roundChambers || 6;
-    liarState.bulletIdx = Math.floor(Math.random() * liarState.chambers);
-    liarState.log.push({ key:'liar.log.lost', vars:{ P: p.name } });
-    if (liarState.log.length > 30) liarState.log.shift();
-  } else {
-    // Fallback: show loser-pick
-    liarState.phase = 'playing';
-    liarState.needLoserPick = true;
-    liarState.lastPlay = null;
-  }
   broadcastLiarState();
 }
 
@@ -818,17 +812,12 @@ function handleLiarDeclareLoser(msg) {
   const target = String(msg.target || '');
   const p = liarState.players[target];
   if (!p || p.eliminated) return;
-  // Move to shooting phase
+  if (!p.revolver) p.revolver = newRevolver();
   liarState.needLoserPick = false;
+  liarState.liarpick = null;
   liarState.phase = 'shooting';
   liarState.shooter = target;
-  // Fresh revolver each round: count down chambers as rounds progress?
-  // Steam rules: each player has their own revolver that doesn't reset within a "death-round"
-  // But per user spec: Fresh revolver each round (1/6 then 1/5 then 1/4...)
-  // → chambers decrease each consecutive shooting event in this game until someone dies, then reset
-  liarState.chambers = liarState._roundChambers || 6;
-  liarState.bulletIdx = Math.floor(Math.random() * liarState.chambers);
-  liarState.log.push({ key:'liar.log.lost', vars:{ P: p.name } });
+  liarState.log.push({ key:'liar.log.lost', vars:{ P: p.name, C: p.revolver.chambers } });
   if (liarState.log.length > 30) liarState.log.shift();
   broadcastLiarState();
 }
@@ -838,29 +827,38 @@ function handleLiarPullTrigger(sock) {
   if (liarState.phase !== 'shooting') return;
   if (info.id !== liarState.shooter) return;
 
-  const chamber = Math.floor(Math.random() * liarState.chambers);
-  const isBang = chamber === liarState.bulletIdx;
   const shooterId = liarState.shooter;
-  const shooterName = liarState.players[shooterId].name;
+  const shooter = liarState.players[shooterId];
+  const rev = shooter.revolver;
 
-  // Broadcast trigger animation result to TVs and phones
-  broadcast({ type:'liar-trigger-result', result: isBang ? 'bang' : 'click', bulletIdx: liarState.bulletIdx, chambers: liarState.chambers, shooter: shooterId });
+  // Pick a random chamber from the remaining ones
+  const fired = Math.floor(Math.random() * rev.chambers);
+  const isBang = fired === rev.bulletIdx;
 
-  // After a delay (for the animation), resolve the round
+  // Broadcast result to TV and phones (with full revolver info for animation)
+  broadcast({
+    type: 'liar-trigger-result',
+    result: isBang ? 'bang' : 'click',
+    bulletIdx: rev.bulletIdx,
+    chambers: rev.chambers,
+    firedChamber: fired,
+    shooter: shooterId,
+  });
+
   setTimeout(() => {
     if (isBang) {
-      liarState.players[shooterId].eliminated = true;
-      liarState.log.push({ key:'liar.log.bang', vars:{ P: shooterName } });
-      // Reset chambers for next death sequence
-      liarState._roundChambers = 6;
+      // BANG — player eliminated, get a fresh revolver for next game
+      shooter.eliminated = true;
+      shooter.revolver = newRevolver();  // reset for next game
+      liarState.log.push({ key:'liar.log.bang', vars:{ P: shooter.name } });
     } else {
-      liarState.log.push({ key:'liar.log.click', vars:{ P: shooterName } });
-      // Survived: next round will have one fewer chamber
-      liarState._roundChambers = Math.max(2, liarState.chambers - 1);
+      // CLICK — survived, one fewer chamber (more dangerous next time)
+      shooter.revolver = survivedRevolver(rev);
+      liarState.log.push({ key:'liar.log.click', vars:{ P: shooter.name, C: shooter.revolver.chambers } });
     }
     if (liarState.log.length > 30) liarState.log.shift();
 
-    // Check if game ended
+    // Check game end
     const alive = Object.values(liarState.players).filter(p => !p.eliminated);
     if (alive.length <= 1) {
       liarState.phase = 'ended';
@@ -870,49 +868,24 @@ function handleLiarPullTrigger(sock) {
       return;
     }
 
-    // Reset for next round
+    // Next round
     liarState.phase = 'playing';
     liarState.shooter = null;
-    liarState.lastPlay = null;
     liarState.needLoserPick = false;
     liarState.round++;
     liarState.currentRank = RANKS[Math.floor(Math.random() * RANKS.length)];
-
-    // Reset turn order: alive players, advance from current shooter
-    const aliveOrder = liarState.order.filter(id => !liarState.players[id].eliminated);
-    if (aliveOrder.length) {
-      // Start with the player AFTER the shooter (or the shooter if they survived)
-      if (isBang) {
-        // shooter eliminated — start with next alive
-        const eliminatedOrderIdx = liarState.order.indexOf(shooterId);
-        // find next alive id in order
-        let nextId = null;
-        for (let i = 1; i <= liarState.order.length; i++) {
-          const cand = liarState.order[(eliminatedOrderIdx + i) % liarState.order.length];
-          if (!liarState.players[cand].eliminated) { nextId = cand; break; }
-        }
-        liarState.turnIdx = nextId ? aliveOrder.indexOf(nextId) : 0;
-      } else {
-        // shooter survives → they start next round
-        liarState.turnIdx = aliveOrder.indexOf(shooterId);
-      }
-    }
     broadcastLiarState();
-  }, 2500);  // matches phone+TV animation timing
+  }, 2500);
 }
 
 function resetLiarGame() {
   liarState.phase = 'lobby';
   liarState.players = {};
   liarState.order = [];
-  liarState.turnIdx = 0;
   liarState.currentRank = null;
-  liarState.lastPlay = null;
   liarState.shooter = null;
   liarState.needLoserPick = false;
-  liarState.chambers = 6;
-  liarState.bulletIdx = 0;
-  liarState._roundChambers = 6;
+  liarState.liarpick = null;
   liarState.round = 1;
   liarState.log = [];
   broadcastLiarState();
@@ -935,17 +908,19 @@ function buildRouletteStateMsg() {
   };
 }
 function buildLiarStateMsg() {
+  // Expose shooter's revolver at top level for TV display convenience
+  const shooter = liarState.shooter;
+  const shooterRevolver = shooter && liarState.players[shooter] ? liarState.players[shooter].revolver : null;
   return {
     type: 'liar-state',
     phase: liarState.phase,
-    players: liarState.players,
+    players: liarState.players,  // each has .revolver: { chambers, bulletIdx }
     order: liarState.order,
-    turnIdx: liarState.turnIdx,
     currentRank: liarState.currentRank,
-    lastPlay: liarState.lastPlay,
     shooter: liarState.shooter,
-    chambers: liarState.chambers,
+    chambers: shooterRevolver ? shooterRevolver.chambers : 6,  // for TV display
     needLoserPick: liarState.needLoserPick,
+    liarpick: liarState.liarpick || null,
     round: liarState.round,
     log: liarState.log,
   };

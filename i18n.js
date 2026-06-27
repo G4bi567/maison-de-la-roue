@@ -289,11 +289,16 @@ const TRANSLATIONS = {
                           pt:'Último sobrevivente vence 🏆' },
 
   // gameplay UI
-  'liar.current_rank':  { fr:'Rang à annoncer',    en:'Current rank',     pt:'Carta atual' },
+  'liar.current_rank':  { fr:'Couleur à jouer',    en:'Color to play',    pt:'Cor a jogar' },
   'liar.turn':          { fr:'À jouer',            en:"Whose turn",       pt:'Vez de' },
   'liar.your_turn':        { fr:'C\'est ton tour !',   en:'Your turn!',         pt:'É a tua vez!' },
-  'liar.card_to_play':  { fr:'Carte à jouer',      en:'Card to play',     pt:'Carta a jogar' },
+  'liar.card_to_play':  { fr:'Couleur à jouer',    en:'Suit to play',     pt:'Naipe a jogar' },
   'liar.chambers_left': { fr:'chambres restantes', en:'chambers left',    pt:'câmaras restantes' },
+  'liar.flip_cards':    { fr:'RETOURNEZ LES CARTES', en:'FLIP THE CARDS', pt:'VIRE AS CARTAS' },
+  'liar.accused':       { fr:'a accusé',            en:'accused',         pt:'acusou' },
+  'liar.who_shoots':    { fr:'Qui tire ?',          en:'Who shoots?',     pt:'Quem dispara?' },
+  'liar.was_lying':     { fr:'mentait — il tire',   en:'was lying — they shoot', pt:'estava a mentir — dispara' },
+  'liar.was_wrong':     { fr:'avait tort — il tire', en:'was wrong — they shoot', pt:'estava errado — dispara' },
   'liar.done_playing':     { fr:'✅  J\'ai joué',       en:'✅  Done playing',    pt:'✅  Joguei' },
   'liar.playing_now':      { fr:'EN TRAIN DE JOUER',   en:'NOW PLAYING',        pt:'A JOGAR AGORA' },
   'liar.call_liar_anytime':{ fr:'Crie LIAR sur n\'importe qui, n\'importe quand', en:'Call LIAR on anyone, anytime', pt:'Chama LIAR a qualquer um, a qualquer momento' },
@@ -331,13 +336,13 @@ const TRANSLATIONS = {
   'liar.confirm_reset': { fr:'Démarrer une nouvelle partie ?', en:'Start a new game?', pt:'Começar um novo jogo?' },
 
   // log lines (server uses keys with placeholders)
-  'liar.log.start':     { fr:'Partie démarrée ! Premier rang : %R%', en:'Game started! First rank: %R%', pt:'Jogo começou! Primeira carta: %R%' },
+  'liar.log.start':     { fr:'Partie démarrée ! Symbole : %R%', en:'Game started! Suit: %R%', pt:'Jogo começou! Naipe: %R%' },
   'liar.log.played':    { fr:'%P% a joué ses cartes', en:'%P% played their cards', pt:'%P% jogou as cartas' },
   'liar.log.play':      { fr:'%P% joue %N% carte(s) — annonce %N%× %R%', en:'%P% plays %N% card(s) — claims %N%× %R%', pt:'%P% joga %N% carta(s) — declara %N%× %R%' },
   'liar.log.believe':   { fr:'%P% croit — au tour suivant !', en:'%P% believes — next turn!', pt:'%P% acredita — próxima vez!' },
-  'liar.log.bluff':     { fr:'%P% crie LIAR sur %P2% !', en:'%P% calls LIAR on %P2%!', pt:'%P% grita LIAR a %P2%!' },
-  'liar.log.lost':      { fr:'%P% a perdu la manche et doit tirer', en:'%P% lost the round and must shoot', pt:'%P% perdeu a ronda e tem de disparar' },
-  'liar.log.click':     { fr:'CLIC ! %P% est en vie.', en:'CLICK! %P% is alive.', pt:'CLIQUE! %P% está vivo.' },
+  'liar.log.bluff':     { fr:'%P% crie LIAR sur %T% !', en:'%P% calls LIAR on %T%!', pt:'%P% grita LIAR a %T%!' },
+  'liar.log.lost':      { fr:'%P% doit tirer — revolver %C% chambres', en:'%P% must shoot — %C% chambers', pt:'%P% tem de disparar — %C% câmaras' },
+  'liar.log.click':     { fr:'CLIC ! %P% survit. Plus que %C% chambres.', en:'CLICK! %P% survives. %C% chambers left.', pt:'CLIQUE! %P% sobrevive. %C% câmaras restantes.' },
   'liar.log.bang':      { fr:'💀 BANG ! %P% est éliminé.', en:'💀 BANG! %P% is eliminated.', pt:'💀 BANG! %P% foi eliminado.' },
   'liar.log.win':       { fr:'🏆 %P% remporte la partie !', en:'🏆 %P% wins the game!', pt:'🏆 %P% vence o jogo!' },
 

@@ -655,13 +655,48 @@ function renderLiar() {
   // PLAYING phase — just card type + chambers + LIAR buttons
   if (phase === 'playing') {
     const alive = Object.entries(s.players).filter(([,p]) => !p.eliminated);
-    const others = alive.filter(([id]) => id !== myId);
+    // Suit color
+    const isRed = s.currentRank && (s.currentRank.includes('♥') || s.currentRank.includes('♦'));
+    const suitColor = isRed ? '#ff4060' : '#f5ead0';
+    const suitGlow  = isRed ? 'rgba(255,64,96,.6)' : 'rgba(245,234,208,.4)';
+
+    // VERDICT SCREEN — someone called LIAR, flip cards, who was wrong?
+    if (s.needLoserPick && s.liarpick) {
+      const lp = s.liarpick;
+      const caller = s.players[lp.callerId];
+      const target = s.players[lp.targetId];
+      c.innerHTML = `
+        <div style="text-align:center;padding:20px 0 16px">
+          <div style="font-size:28px;margin-bottom:6px">🃏</div>
+          <div style="font-size:11px;font-family:'JetBrains Mono',monospace;letter-spacing:.4em;color:#ff6170;text-transform:uppercase;margin-bottom:12px">${t('liar.flip_cards')}</div>
+          <div style="font-style:italic;color:var(--ink-dim);font-size:14px;margin-bottom:24px">
+            <b style="color:var(--ink)">${escapeHtml(caller ? caller.name : '')}</b> ${t('liar.accused')} <b style="color:var(--ink)">${escapeHtml(target ? target.name : '')}</b>
+          </div>
+          <div style="font-size:12px;font-family:'JetBrains Mono',monospace;letter-spacing:.3em;color:var(--ink-dim);margin-bottom:14px">${t('liar.who_shoots')}</div>
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <button class="btn-bluff" id="btn-target-shoots" style="padding:20px;font-size:15px;border-radius:12px">
+              💀 ${escapeHtml(target ? target.name : '')} ${t('liar.was_lying')}
+            </button>
+            <button class="btn-believe" id="btn-caller-shoots" style="padding:20px;font-size:15px;border-radius:12px">
+              🤦 ${escapeHtml(caller ? caller.name : '')} ${t('liar.was_wrong')}
+            </button>
+          </div>
+        </div>
+      `;
+      $('#btn-target-shoots').addEventListener('click', () => {
+        ws.send(JSON.stringify({type:'liar-declare-loser', target: lp.targetId}));
+      });
+      $('#btn-caller-shoots').addEventListener('click', () => {
+        ws.send(JSON.stringify({type:'liar-declare-loser', target: lp.callerId}));
+      });
+      return;
+    }
 
     c.innerHTML = `
       <div style="text-align:center;padding:18px 0 20px;border-bottom:1px solid var(--line);margin-bottom:18px">
-        <div style="font-size:11px;font-family:'JetBrains Mono',monospace;letter-spacing:.5em;color:var(--ink-dim);text-transform:uppercase;margin-bottom:10px" data-i18n="liar.card_to_play">Carte à jouer</div>
-        <div style="font-size:64px;font-weight:900;font-style:italic;color:var(--purpleb);text-shadow:0 0 30px rgba(157,79,212,.5);line-height:1">${s.currentRank || '—'}</div>
-        <div style="font-family:'JetBrains Mono',monospace;font-size:14px;color:#ff6170;margin-top:12px;letter-spacing:.3em">🔫 ${s.chambers || 6} ${t('liar.chambers_left')}</div>
+        <div style="font-size:11px;font-family:'JetBrains Mono',monospace;letter-spacing:.5em;color:var(--ink-dim);text-transform:uppercase;margin-bottom:10px">${t('liar.card_to_play')}</div>
+        <div style="font-size:52px;font-weight:900;font-style:italic;line-height:1;color:${suitColor};text-shadow:0 0 30px ${suitGlow}">${s.currentRank || '—'}</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:14px;color:#ff6170;margin-top:12px;letter-spacing:.3em">🔫 ${(me && me.revolver ? me.revolver.chambers : 6)} ${t('liar.chambers_left')}</div>
       </div>
       <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:14px">
         ${others.map(([id, p]) => `
