@@ -1,0 +1,7 @@
+services:
+  - type: web
+    name: maison-de-la-roue
+    runtime: node
+    plan: free
+    buildCommand: ""
+    startCommand: node server.js

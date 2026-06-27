@@ -1,0 +1,886 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<title data-i18n-doctitle="menu.join.title">Salon Privé · Joueur</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,wght@0,700;0,900;1,700&family=JetBrains+Mono:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#06060a;--bg2:#0e0a14;--ink:#f5ead0;--ink-dim:#a99e86;--gold:#d4af37;--goldb:#f0cc5a;--red:#b6122a;--redb:#d8213c;--green:#0e6b3a;--greenb:#2fbd7a;--purple:#6b2fa0;--purpleb:#9d4fd4;--line:rgba(212,175,55,.25);}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;}
+html,body{background:var(--bg);color:var(--ink);font-family:"Bodoni Moda",serif;min-height:100vh;overscroll-behavior:none;}
+body{background:radial-gradient(800px 400px at 50% -10%,rgba(212,175,55,.16),transparent 70%),var(--bg);padding:16px;padding-top:60px;padding-bottom:80px;}
+/* JOIN screen */
+.join-wrap{max-width:380px;margin:0 auto;text-align:center;padding-top:40px;}
+.join-head{font-family:"JetBrains Mono",monospace;font-size:10px;letter-spacing:.4em;color:var(--ink-dim);text-transform:uppercase;margin-bottom:16px;}
+.brand{font-weight:900;font-style:italic;font-size:38px;line-height:1;
+  background:linear-gradient(180deg,var(--goldb),var(--gold) 60%,#8a6e1c);-webkit-background-clip:text;background-clip:text;color:transparent;}
+.brand small{display:block;font-family:"JetBrains Mono",monospace;font-style:normal;font-weight:600;font-size:10px;letter-spacing:.35em;color:var(--ink-dim);margin-top:8px;text-transform:uppercase;}
+.divider{width:50px;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);margin:24px auto;}
+.join-text{font-style:italic;color:var(--ink-dim);font-size:14px;line-height:1.6;margin-bottom:24px;}
+.name-input{width:100%;background:rgba(0,0,0,.5);border:1px solid var(--line);color:var(--ink);padding:14px;
+  font-family:"Bodoni Moda",serif;font-style:italic;font-size:18px;text-align:center;border-radius:10px;outline:none;margin-bottom:14px;}
+.name-input:focus{border-color:var(--gold);}
+.enter-btn{width:100%;padding:16px;border-radius:10px;background:linear-gradient(180deg,var(--goldb),var(--gold));color:#201703;
+  border:none;font-family:"JetBrains Mono",monospace;font-weight:800;font-size:13px;letter-spacing:.15em;cursor:pointer;
+  box-shadow:0 8px 24px rgba(212,175,55,.3);}
+.enter-btn:active{transform:scale(.97);}
+/* HEADER */
+.hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;gap:10px;}
+.hdr-name{font-family:"Bodoni Moda",serif;font-style:italic;font-weight:700;font-size:18px;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.hdr-meta{font-family:"JetBrains Mono",monospace;font-size:9px;color:var(--ink-dim);letter-spacing:.2em;text-transform:uppercase;}
+.chips-badge{font-family:"JetBrains Mono",monospace;font-weight:800;font-size:14px;color:var(--goldb);background:rgba(212,175,55,.1);border:1px solid var(--line);padding:6px 10px;border-radius:8px;}
+/* TABS */
+.tabs{display:flex;gap:6px;background:rgba(0,0,0,.4);border:1px solid var(--line);border-radius:10px;padding:4px;margin-bottom:14px;}
+.tab{flex:1;padding:10px;text-align:center;font-family:"JetBrains Mono",monospace;font-weight:800;font-size:11px;letter-spacing:.1em;
+  color:var(--ink-dim);border-radius:7px;cursor:pointer;transition:all .2s;text-transform:uppercase;}
+.tab.active{background:linear-gradient(180deg,var(--goldb),var(--gold));color:#201703;}
+.tab[data-tab="liar"].active{background:linear-gradient(180deg,var(--purpleb),var(--purple));color:#fff;}
+.tab-pane{display:none;}
+.tab-pane.active{display:block;}
+/* ROULETTE PANE */
+.phase-display{text-align:center;padding:10px;border-radius:10px;background:rgba(0,0,0,.4);border:1px solid var(--line);
+  font-family:"JetBrains Mono",monospace;font-weight:800;font-size:12px;letter-spacing:.3em;color:var(--gold);margin-bottom:12px;text-transform:uppercase;}
+.phase-display.spinning{color:var(--goldb);border-color:var(--goldb);animation:pulse 1.2s ease-in-out infinite alternate;}
+.phase-display.payout{color:#f8c5a5;border-color:rgba(248,197,165,.5);}
+@keyframes pulse{to{box-shadow:0 0 14px rgba(240,204,90,.4);}}
+.recent-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;justify-content:center;}
+.hist-num{width:32px;height:32px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-family:"JetBrains Mono",monospace;font-weight:800;font-size:13px;color:#fff;}
+.hist-num.red{background:var(--red);}.hist-num.black{background:#1a1420;border:1px solid #3a2f45;}.hist-num.green{background:var(--green);}
+.chip-select-row{display:flex;justify-content:space-between;gap:6px;margin-bottom:14px;}
+.chip-pick{flex:1;padding:12px 4px;border-radius:10px;border:1px solid var(--line);background:rgba(0,0,0,.3);color:var(--ink);
+  font-family:"JetBrains Mono",monospace;font-weight:800;font-size:13px;cursor:pointer;}
+.chip-pick.active{background:linear-gradient(180deg,var(--goldb),var(--gold));color:#201703;border-color:transparent;}
+.section-title{font-family:"JetBrains Mono",monospace;font-size:10px;font-weight:800;letter-spacing:.3em;color:var(--gold);text-transform:uppercase;margin-bottom:8px;}
+.bet-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;}
+.bet-btn{padding:14px 10px;border-radius:10px;border:1px solid var(--line);background:linear-gradient(180deg,rgba(255,255,255,.02),rgba(0,0,0,.3)),var(--bg2);
+  color:var(--ink);font-family:"Bodoni Moda",serif;font-style:italic;font-weight:700;font-size:16px;cursor:pointer;position:relative;}
+.bet-btn.red{background:linear-gradient(180deg,#ef3a58,#8a0c1f);color:#fff;border-color:#8a0c1f;}
+.bet-btn.black{background:linear-gradient(180deg,#2a2530,#0b080d);color:#fff;border-color:#0b080d;}
+.bet-pay{display:block;font-family:"JetBrains Mono",monospace;font-size:9px;font-weight:800;letter-spacing:.15em;opacity:.7;margin-top:3px;text-transform:uppercase;}
+.num-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:4px;margin-bottom:14px;}
+.num-btn{padding:10px 0;border-radius:6px;border:1px solid var(--line);font-family:"JetBrains Mono",monospace;font-weight:800;font-size:14px;color:#fff;cursor:pointer;background:#1a1420;}
+.num-btn.red{background:var(--red);}.num-btn.green{background:var(--green);grid-column:span 6;}
+.your-bets{background:rgba(0,0,0,.3);border:1px solid var(--line);border-radius:10px;padding:12px;margin-bottom:14px;}
+.your-bet-item{display:flex;justify-content:space-between;font-family:"JetBrains Mono",monospace;font-size:11px;padding:4px 0;border-bottom:1px solid rgba(255,255,255,.04);letter-spacing:.05em;}
+.your-bet-item:last-child{border-bottom:none;}
+.your-bet-item span:last-child{color:var(--goldb);font-weight:800;}
+.action-row{display:grid;grid-template-columns:1fr;gap:8px;}
+.btn-undo{padding:12px;border-radius:10px;border:1px solid var(--line);background:rgba(0,0,0,.4);color:var(--ink);font-family:"JetBrains Mono",monospace;font-weight:800;font-size:12px;letter-spacing:.15em;cursor:pointer;text-transform:uppercase;}
+.notice{text-align:center;padding:14px;background:rgba(0,0,0,.4);border:1px dashed var(--line);border-radius:10px;font-style:italic;color:var(--ink-dim);font-size:13px;}
+/* LIAR PANE */
+.liar-info{background:linear-gradient(180deg,rgba(107,47,160,.1),rgba(0,0,0,.3));border:1px solid rgba(157,79,212,.4);border-radius:12px;padding:14px;margin-bottom:12px;text-align:center;}
+.liar-rank{font-family:"Bodoni Moda",serif;font-style:italic;font-weight:900;font-size:42px;line-height:1;
+  background:linear-gradient(180deg,var(--purpleb),var(--purple));-webkit-background-clip:text;background-clip:text;color:transparent;}
+.liar-label{font-family:"JetBrains Mono",monospace;font-size:9px;letter-spacing:.35em;color:var(--purpleb);text-transform:uppercase;margin-bottom:4px;}
+.liar-status{text-align:center;padding:10px;margin-bottom:12px;border-radius:10px;background:rgba(0,0,0,.4);border:1px solid var(--line);
+  font-family:"JetBrains Mono",monospace;font-weight:800;font-size:12px;letter-spacing:.2em;color:var(--ink-dim);text-transform:uppercase;}
+.liar-status.your-turn{background:linear-gradient(180deg,rgba(157,79,212,.2),rgba(0,0,0,.4));border-color:var(--purpleb);color:var(--purpleb);animation:pulseP 1.6s infinite;}
+@keyframes pulseP{50%{box-shadow:0 0 18px rgba(157,79,212,.4);}}
+.card-count-row{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:12px;}
+.cc-btn{padding:18px 0;border-radius:10px;border:1px solid var(--line);background:rgba(0,0,0,.4);color:var(--ink);font-family:"JetBrains Mono",monospace;font-weight:800;font-size:20px;cursor:pointer;}
+.cc-btn.active{background:linear-gradient(180deg,var(--purpleb),var(--purple));color:#fff;border-color:transparent;}
+.btn-play{width:100%;padding:16px;border-radius:12px;background:linear-gradient(180deg,var(--purpleb),var(--purple));color:#fff;border:none;font-family:"JetBrains Mono",monospace;font-weight:800;font-size:13px;letter-spacing:.2em;cursor:pointer;margin-bottom:12px;text-transform:uppercase;box-shadow:0 6px 18px rgba(107,47,160,.4);}
+.btn-play:disabled{opacity:.4;cursor:not-allowed;box-shadow:none;}
+.btn-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;}
+.btn-believe{padding:18px;border-radius:12px;background:linear-gradient(180deg,#3aa57a,#0e6b3a);color:#fff;border:none;font-family:"JetBrains Mono",monospace;font-weight:800;font-size:13px;letter-spacing:.15em;cursor:pointer;text-transform:uppercase;box-shadow:0 6px 18px rgba(46,141,98,.3);}
+.btn-bluff{padding:18px;border-radius:12px;background:linear-gradient(180deg,var(--redb),var(--red));color:#fff;border:none;font-family:"JetBrains Mono",monospace;font-weight:800;font-size:13px;letter-spacing:.15em;cursor:pointer;text-transform:uppercase;box-shadow:0 6px 18px rgba(216,33,60,.3);}
+.btn-believe:active,.btn-bluff:active,.btn-play:active{transform:scale(.97);}
+.loser-pick-title{text-align:center;font-family:"Bodoni Moda",serif;font-style:italic;font-size:18px;color:var(--ink);margin-bottom:6px;}
+.loser-pick-sub{text-align:center;font-family:"JetBrains Mono",monospace;font-size:10px;color:var(--ink-dim);letter-spacing:.2em;margin-bottom:12px;text-transform:uppercase;}
+.loser-list{display:flex;flex-direction:column;gap:6px;margin-bottom:12px;}
+.loser-pick-btn{display:flex;align-items:center;gap:10px;padding:14px;border-radius:10px;border:1px solid var(--line);background:rgba(0,0,0,.4);color:var(--ink);font-family:"Bodoni Moda",serif;font-style:italic;font-size:17px;cursor:pointer;width:100%;text-align:left;}
+.loser-pick-btn:active{background:rgba(255,97,112,.15);border-color:var(--redb);}
+.loser-pick-btn .dot{width:12px;height:12px;border-radius:50%;box-shadow:0 0 8px currentColor;}
+.trigger-wrap{text-align:center;padding:24px 14px;background:radial-gradient(circle at center,rgba(60,5,5,.4),rgba(0,0,0,.6));border:2px solid rgba(255,97,112,.5);border-radius:16px;margin-bottom:12px;}
+.trigger-title{font-family:"JetBrains Mono",monospace;font-size:11px;letter-spacing:.4em;color:#ff6170;text-transform:uppercase;margin-bottom:8px;}
+.trigger-name{font-family:"Bodoni Moda",serif;font-style:italic;font-weight:900;font-size:26px;color:#fff;margin-bottom:6px;}
+.trigger-risk{font-family:"JetBrains Mono",monospace;font-size:12px;letter-spacing:.2em;color:var(--ink-dim);margin-bottom:14px;text-transform:uppercase;}
+.trigger-risk b{color:#ff6170;font-size:16px;}
+.trigger-btn{width:100%;padding:22px;border-radius:14px;background:linear-gradient(180deg,#ff6170,#8a0c1f);color:#fff;border:2px solid #ff6170;font-family:"JetBrains Mono",monospace;font-weight:800;font-size:16px;letter-spacing:.3em;cursor:pointer;text-transform:uppercase;animation:pulseR 1.4s infinite;}
+@keyframes pulseR{50%{box-shadow:0 0 25px rgba(255,97,112,.6);}}
+.trigger-btn:active{transform:scale(.96);}
+.lobby-card{text-align:center;padding:30px 16px;background:linear-gradient(180deg,rgba(107,47,160,.08),rgba(0,0,0,.4));border:1px solid rgba(157,79,212,.4);border-radius:14px;margin-bottom:12px;}
+.lobby-card h3{font-family:"Bodoni Moda",serif;font-style:italic;font-weight:900;font-size:26px;
+  background:linear-gradient(180deg,var(--purpleb),var(--purple));-webkit-background-clip:text;background-clip:text;color:transparent;margin-bottom:6px;}
+.lobby-card p{font-style:italic;color:var(--ink-dim);font-size:13px;line-height:1.5;margin-bottom:14px;}
+.btn-join-liar{width:100%;padding:14px;border-radius:10px;background:linear-gradient(180deg,var(--purpleb),var(--purple));color:#fff;border:none;font-family:"JetBrains Mono",monospace;font-weight:800;font-size:12px;letter-spacing:.2em;cursor:pointer;text-transform:uppercase;}
+.btn-start-liar{width:100%;padding:14px;border-radius:10px;background:linear-gradient(180deg,var(--goldb),var(--gold));color:#201703;border:none;font-family:"JetBrains Mono",monospace;font-weight:800;font-size:12px;letter-spacing:.2em;cursor:pointer;margin-top:8px;text-transform:uppercase;}
+.btn-start-liar:disabled{opacity:.4;cursor:not-allowed;}
+.lobby-pips{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-bottom:10px;}
+.lobby-pip{padding:5px 10px;border-radius:14px;border:1px solid;font-family:"JetBrains Mono",monospace;font-weight:800;font-size:11px;letter-spacing:.05em;}
+.eliminated-banner{text-align:center;padding:20px;background:rgba(0,0,0,.6);border:1px dashed #ff6170;border-radius:12px;color:#ff6170;font-family:"JetBrains Mono",monospace;font-weight:800;font-size:13px;letter-spacing:.25em;text-transform:uppercase;}
+.ended-banner{text-align:center;padding:24px;background:linear-gradient(180deg,rgba(212,175,55,.15),rgba(0,0,0,.4));border:1px solid var(--gold);border-radius:14px;margin-bottom:12px;}
+.ended-banner .trophy{font-size:48px;}
+.ended-banner h3{font-family:"Bodoni Moda",serif;font-style:italic;font-weight:900;font-size:28px;color:var(--goldb);margin:6px 0;}
+.btn-reset{width:100%;padding:14px;border-radius:10px;background:rgba(0,0,0,.5);border:1px solid var(--line);color:var(--ink);font-family:"JetBrains Mono",monospace;font-weight:800;font-size:12px;letter-spacing:.15em;cursor:pointer;text-transform:uppercase;}
+</style></head>
+<body>
+
+<!-- JOIN screen -->
+<div id="join-screen">
+  <div class="join-wrap">
+    <div class="join-head" data-i18n="phone.join.head">EST. SOIRÉE · SALON PRIVÉ</div>
+    <div class="brand">
+      <span data-i18n="brand.title">Maison de la Roue</span>
+      <small data-i18n="brand.table">Table № 1</small>
+    </div>
+    <div class="divider"></div>
+    <p class="join-text" data-i18n="phone.join.welcome"></p>
+    <div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.35em;color:var(--ink-dim);text-transform:uppercase;margin:0 0 8px" data-i18n="phone.join.pick_avatar">Choose your avatar</div>
+    <div id="avatar-picker" style="display:grid;grid-template-columns:repeat(6,1fr);gap:6px;margin-bottom:14px"></div>
+    <input type="text" class="name-input" id="join-name" data-i18n-placeholder="phone.join.placeholder" maxlength="14" autocomplete="off">
+    <button class="enter-btn" id="join-btn" data-i18n="phone.join.enter">Entrer →</button>
+  </div>
+</div>
+
+<!-- GAME screen -->
+<div id="game-screen" style="display:none;">
+  <div class="hdr">
+    <div style="min-width:0;">
+      <div class="hdr-name" id="hdr-name">—</div>
+      <div class="hdr-meta" data-i18n="phone.guest">Invité assis</div>
+    </div>
+    <div class="chips-badge" id="hdr-chips">500</div>
+  </div>
+
+  <div class="tabs">
+    <div class="tab active" data-tab="roulette" data-i18n="phone.tab.roulette">🎰 Roulette</div>
+    <div class="tab" data-tab="liar" data-i18n="phone.tab.liar">🃏 Liar's Bar</div>
+    <div class="tab" data-tab="games" data-i18n="phone.games.tab">🎲 Jeux</div>
+  </div>
+
+  <!-- ROULETTE TAB -->
+  <div class="tab-pane active" id="pane-roulette">
+    <div class="phase-display" id="phase-display" data-i18n="phone.phase.bet">PLACEZ VOS MISES</div>
+    <div id="recent-section">
+      <div class="section-title" data-i18n="phone.recent">NUMÉROS RÉCENTS</div>
+      <div class="recent-row" id="recent-row"><div style="color:var(--ink-dim);font-family:'JetBrains Mono';font-size:10px;letter-spacing:.2em" data-i18n="phone.none_yet">NONE YET</div></div>
+    </div>
+
+    <div class="section-title" data-i18n="phone.chip.wager">Jeton à miser</div>
+    <div class="chip-select-row" id="chip-select">
+      <button class="chip-pick" data-amount="5">5</button>
+      <button class="chip-pick active" data-amount="10">10</button>
+      <button class="chip-pick" data-amount="25">25</button>
+      <button class="chip-pick" data-amount="50">50</button>
+      <button class="chip-pick" data-amount="100">100</button>
+    </div>
+
+    <div class="section-title" data-i18n="phone.outside">Mises extérieures</div>
+    <div class="bet-grid">
+      <button class="bet-btn red" data-bet="red"><span data-i18n="bet.red">Rouge</span><span class="bet-pay" data-i18n="bet.pays11">PAIE 1:1</span></button>
+      <button class="bet-btn black" data-bet="black"><span data-i18n="bet.black">Noir</span><span class="bet-pay" data-i18n="bet.pays11">PAIE 1:1</span></button>
+      <button class="bet-btn" data-bet="even"><span data-i18n="bet.even">Pair</span><span class="bet-pay" data-i18n="bet.pays11">PAIE 1:1</span></button>
+      <button class="bet-btn" data-bet="odd"><span data-i18n="bet.odd">Impair</span><span class="bet-pay" data-i18n="bet.pays11">PAIE 1:1</span></button>
+      <button class="bet-btn" data-bet="low"><span data-i18n="bet.low">1 – 18</span><span class="bet-pay" data-i18n="bet.pays11">PAIE 1:1</span></button>
+      <button class="bet-btn" data-bet="high"><span data-i18n="bet.high">19 – 36</span><span class="bet-pay" data-i18n="bet.pays11">PAIE 1:1</span></button>
+      <button class="bet-btn" data-bet="dozen1"><span data-i18n="bet.dozen1">1ère 12</span><span class="bet-pay" data-i18n="bet.pays21">PAIE 2:1</span></button>
+      <button class="bet-btn" data-bet="dozen2"><span data-i18n="bet.dozen2">2ème 12</span><span class="bet-pay" data-i18n="bet.pays21">PAIE 2:1</span></button>
+      <button class="bet-btn" data-bet="dozen3"><span data-i18n="bet.dozen3">3ème 12</span><span class="bet-pay" data-i18n="bet.pays21">PAIE 2:1</span></button>
+      <button class="bet-btn" data-bet="col1"><span data-i18n="bet.col1">Col. I</span><span class="bet-pay" data-i18n="bet.pays21">PAIE 2:1</span></button>
+      <button class="bet-btn" data-bet="col2"><span data-i18n="bet.col2">Col. II</span><span class="bet-pay" data-i18n="bet.pays21">PAIE 2:1</span></button>
+      <button class="bet-btn" data-bet="col3"><span data-i18n="bet.col3">Col. III</span><span class="bet-pay" data-i18n="bet.pays21">PAIE 2:1</span></button>
+    </div>
+
+    <div class="section-title" data-i18n="phone.straight">Numéro plein · Paie 35:1</div>
+    <div class="num-grid" id="num-grid"></div>
+
+    <div class="your-bets" id="your-bets" style="display:none;">
+      <div class="section-title" style="margin-bottom:6px" data-i18n="phone.your_bets">Vos mises ce tour</div>
+      <div id="your-bets-list"></div>
+    </div>
+
+    <div class="action-row">
+      <button class="btn-undo" id="btn-undo" data-i18n="phone.undo">Annuler dernière mise</button>
+    </div>
+  </div>
+
+  <!-- LIAR'S BAR TAB -->
+  <div class="tab-pane" id="pane-liar">
+    <div id="liar-content"></div>
+  </div>
+
+  <!-- MINI-GAMES TAB -->
+  <div class="tab-pane" id="pane-games">
+    <div id="games-content"></div>
+  </div>
+</div>
+
+<script src="/i18n.js"></script>
+<script src="/lang-switcher.js"></script>
+<script>
+I18N.init();
+
+let myId = localStorage.getItem('player_id');
+if (!myId) { myId = 'p_' + Math.random().toString(36).slice(2,10) + Date.now().toString(36); localStorage.setItem('player_id', myId); }
+
+const $ = s => document.querySelector(s);
+const RED = new Set([1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36]);
+
+// Build number grid
+const grid = $('#num-grid');
+grid.innerHTML = `<button class="num-btn green" data-num="0">0</button>` + 
+  Array.from({length:36},(_,i)=>i+1).map(n=>`<button class="num-btn ${RED.has(n)?'red':''}" data-num="${n}">${n}</button>`).join('');
+
+let ws = null;
+let state = null;     // roulette state
+let liarState = null;
+let myChip = 10;
+let myBets = [];      // [{kind:'outside'|'number', key, amount}]
+let myChips = 500;
+let liarSelectedCount = 1;
+
+// ============== AVATAR PICKER ==============
+const AVATARS = ['🦊','🐺','🦁','🐻','🦅','🐯','🐸','🦝','🐼','🐨','🦄','🐲','🦉','🦂','🐧','🦋','👑','🎩','🃏','💀','🍀','⚜️'];
+let chosenAvatar = localStorage.getItem('player_avatar') || '🎩';
+function renderAvatarPicker() {
+  const wrap = $('#avatar-picker'); if (!wrap) return;
+  wrap.innerHTML = AVATARS.map(a => `<button type="button" data-av="${a}" style="font-size:24px;padding:8px 0;background:${a===chosenAvatar?'rgba(212,175,55,.25)':'rgba(0,0,0,.4)'};border:1px solid ${a===chosenAvatar?'var(--gold)':'var(--line)'};border-radius:6px;cursor:pointer;color:#fff">${a}</button>`).join('');
+  wrap.querySelectorAll('button').forEach(b => b.addEventListener('click', () => {
+    chosenAvatar = b.dataset.av;
+    localStorage.setItem('player_avatar', chosenAvatar);
+    renderAvatarPicker();
+  }));
+}
+renderAvatarPicker();
+
+// ============== BUZZ (vibration) ==============
+function buzz(ms) { try { if (navigator.vibrate) navigator.vibrate(ms || 200); } catch(e){} }
+
+// ============== JOIN ==============
+$('#join-btn').addEventListener('click', joinTable);
+$('#join-name').addEventListener('keydown', e => { if (e.key === 'Enter') joinTable(); });
+
+function joinTable() {
+  const name = $('#join-name').value.trim();
+  if (!name) { alert(t('phone.join.warn')); return; }
+  localStorage.setItem('player_name', name);
+  $('#join-screen').style.display = 'none';
+  $('#game-screen').style.display = 'block';
+  $('#hdr-name').textContent = chosenAvatar + ' ' + name;
+  connect();
+}
+const savedName = localStorage.getItem('player_name');
+if (savedName) { $('#join-name').value = savedName; }
+
+// ============== TABS ==============
+document.querySelectorAll('.tab').forEach(t => {
+  t.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
+    document.querySelectorAll('.tab-pane').forEach(x => x.classList.remove('active'));
+    t.classList.add('active');
+    $('#pane-' + t.dataset.tab).classList.add('active');
+  });
+});
+
+// ============== WEBSOCKET ==============
+function connect() {
+  const proto = location.protocol === 'https:' ? 'wss' : 'ws';
+  ws = new WebSocket(proto + '://' + location.host);
+  ws.onopen = () => {
+    const plainName = localStorage.getItem('player_name') || $('#hdr-name').textContent;
+    ws.send(JSON.stringify({type:'hello', id:myId, name: plainName, avatar: chosenAvatar }));
+  };
+  ws.onclose = () => setTimeout(connect, 1200);
+  ws.onmessage = e => {
+    const m = JSON.parse(e.data);
+    if (m.type === 'state') applyRouletteState(m);
+    if (m.type === 'liar-state') applyLiarState(m);
+    if (m.type === 'mini-state') applyMiniState(m);
+    if (m.type === 'spin-end') { if (m.result) SFX.win(); }
+  };
+}
+
+// ============== ROULETTE ==============
+function applyRouletteState(s) {
+  state = s;
+  const me = s.players[myId];
+  if (me) { myChips = me.chips; $('#hdr-chips').textContent = myChips.toLocaleString(); }
+
+  const ph = $('#phase-display');
+  ph.className = 'phase-display ' + s.phase;
+  ph.textContent = s.phase === 'betting' ? t('phone.phase.bet')
+                : s.phase === 'spinning' ? t('phone.phase.nomore')
+                : t('phone.phase.end');
+
+  // Recent
+  const recent = (s.history || []).slice(-8).reverse();
+  $('#recent-row').innerHTML = recent.length
+    ? recent.map(r => `<div class="hist-num ${r.color}">${r.number}</div>`).join('')
+    : `<div style="color:var(--ink-dim);font-family:'JetBrains Mono';font-size:10px;letter-spacing:.2em">${t('phone.none_yet')}</div>`;
+
+  // Disable bets when not betting
+  const lockBets = s.phase !== 'betting';
+  document.querySelectorAll('.bet-btn,.num-btn').forEach(b => { b.disabled = lockBets; b.style.opacity = lockBets ? .4 : 1; });
+}
+
+// Chip select
+document.querySelectorAll('.chip-pick').forEach(b => {
+  b.addEventListener('click', () => {
+    document.querySelectorAll('.chip-pick').forEach(x => x.classList.remove('active'));
+    b.classList.add('active');
+    myChip = parseInt(b.dataset.amount);
+    if (navigator.vibrate) navigator.vibrate(8);
+  });
+});
+
+// Bet buttons
+function placeBet(kind, key) {
+  if (!state || state.phase !== 'betting') { showToast(t('phone.closed')); return; }
+  if (myChips < myChip) { showToast(t('phone.no_chips')); return; }
+  myBets.push({ kind, key, amount: myChip });
+  myChips -= myChip;
+  $('#hdr-chips').textContent = myChips.toLocaleString();
+  ws.send(JSON.stringify({type:'place-bet', kind, key, amount: myChip}));
+  renderYourBets();
+  if (navigator.vibrate) navigator.vibrate(15);
+}
+document.querySelectorAll('.bet-btn').forEach(b => {
+  b.addEventListener('click', () => placeBet('outside', b.dataset.bet));
+});
+document.querySelectorAll('.num-btn').forEach(b => {
+  b.addEventListener('click', () => placeBet('number', b.dataset.num));
+});
+function renderYourBets() {
+  const wrap = $('#your-bets');
+  if (myBets.length === 0) { wrap.style.display = 'none'; return; }
+  wrap.style.display = 'block';
+  $('#your-bets-list').innerHTML = myBets.map(b => {
+    const lbl = b.kind === 'number' ? '#' + b.key : t('bet.' + b.key);
+    return `<div class="your-bet-item"><span>${lbl}</span><span>${b.amount}</span></div>`;
+  }).join('');
+}
+$('#btn-undo').addEventListener('click', () => {
+  if (myBets.length === 0) return;
+  const last = myBets.pop();
+  myChips += last.amount;
+  $('#hdr-chips').textContent = myChips.toLocaleString();
+  ws.send(JSON.stringify({type:'undo-bet'}));
+  renderYourBets();
+});
+
+// Reset bets after spin
+const _origApply = applyRouletteState;
+applyRouletteState = function(s) {
+  _origApply(s);
+  if (s.phase === 'betting' && s.lastClearedAt && s.lastClearedAt !== window._lastRoundMark) {
+    window._lastRoundMark = s.lastClearedAt;
+    myBets = [];
+    renderYourBets();
+  }
+};
+
+function showToast(text) {
+  const el = document.createElement('div');
+  el.style.cssText = 'position:fixed;bottom:60px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.9);color:#fff;font-family:JetBrains Mono;font-size:12px;letter-spacing:.1em;padding:10px 18px;border-radius:8px;z-index:9999;border:1px solid rgba(212,175,55,.4);';
+  el.textContent = text;
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 2000);
+}
+
+// ============== LIAR'S BAR ==============
+function applyLiarState(s) {
+  // Buzz when MY shooting moment starts, or when MY turn starts
+  const prev = liarState;
+  if (prev && s) {
+    const wasMyShoot = prev.shooter === myId && prev.phase === 'shooting';
+    const isMyShoot = s.shooter === myId && s.phase === 'shooting';
+    if (!wasMyShoot && isMyShoot) buzz([100, 60, 100, 60, 200]);
+    // Turn change buzz (only on playing phase)
+    const aliveOrder = (s.order||[]).filter(id => s.players[id] && !s.players[id].eliminated);
+    const currentId = aliveOrder.length ? aliveOrder[s.turnIdx % aliveOrder.length] : null;
+    const prevAlive = (prev.order||[]).filter(id => prev.players[id] && !prev.players[id].eliminated);
+    const prevId = prevAlive.length ? prevAlive[prev.turnIdx % prevAlive.length] : null;
+    if (s.phase === 'playing' && currentId === myId && prevId !== myId) buzz(180);
+  }
+  liarState = s;
+  renderLiar();
+}
+
+function renderLiar() {
+  if (!liarState) return;
+  const s = liarState;
+  const c = $('#liar-content');
+  const me = s.players[myId];
+  const phase = s.phase;
+
+  // LOBBY
+  if (phase === 'lobby') {
+    const pids = Object.keys(s.players);
+    const inGame = pids.includes(myId);
+    const pips = pids.map(id => {
+      const p = s.players[id];
+      return `<div class="lobby-pip" style="border-color:${p.color}80;color:${p.color}">${escapeHtml(p.name)}</div>`;
+    }).join('') || `<span style="color:var(--ink-dim);font-style:italic">—</span>`;
+
+    c.innerHTML = `
+      <div class="lobby-card">
+        <h3 data-i18n="liar.lobby.title">Liar's Bar</h3>
+        <p data-i18n="liar.lobby.sub">Bluff. Nerve. And a loaded revolver.</p>
+        <div class="lobby-pips">${pips}</div>
+        ${ inGame
+          ? `<button class="btn-start-liar" ${pids.length<2?'disabled':''} id="btn-start">${pids.length<2?t('liar.lobby.need2'):t('liar.lobby.start')}</button>`
+          : `<button class="btn-join-liar" id="btn-join">${t('liar.lobby.join')}</button>` }
+      </div>
+      <div class="liar-info" style="text-align:left;padding:14px 16px;">
+        <div class="section-title" style="text-align:center;margin-bottom:10px;color:var(--purpleb)" data-i18n="liar.rules.h">How to play</div>
+        <ol style="padding-left:18px;font-size:13px;line-height:1.6;color:var(--ink-dim);font-family:'Bodoni Moda';font-style:italic">
+          <li data-i18n="liar.rules.1"></li>
+          <li data-i18n="liar.rules.2"></li>
+          <li data-i18n="liar.rules.3"></li>
+          <li data-i18n="liar.rules.4"></li>
+          <li data-i18n="liar.rules.5"></li>
+          <li data-i18n="liar.rules.6"></li>
+          <li data-i18n="liar.rules.7"></li>
+        </ol>
+      </div>
+    `;
+    I18N.apply();
+    const bj = $('#btn-join'); if (bj) bj.addEventListener('click', () => ws.send(JSON.stringify({type:'liar-join', name: localStorage.getItem('player_name') || ''})));
+    const bs = $('#btn-start'); if (bs) bs.addEventListener('click', () => ws.send(JSON.stringify({type:'liar-start'})));
+    return;
+  }
+
+  // ENDED
+  if (phase === 'ended') {
+    const alive = Object.entries(s.players).filter(([,p])=>!p.eliminated);
+    const winner = alive[0]?.[1];
+    c.innerHTML = `
+      <div class="ended-banner">
+        <div class="trophy">🏆</div>
+        <h3>${winner ? escapeHtml(winner.name) : '—'}</h3>
+        <div style="font-family:'JetBrains Mono';font-size:11px;letter-spacing:.3em;color:var(--gold);text-transform:uppercase;">${t('liar.winner')}</div>
+      </div>
+      <button class="btn-reset" id="btn-reset">${t('liar.new_game')}</button>
+    `;
+    $('#btn-reset').addEventListener('click', () => {
+      if (confirm(t('liar.confirm_reset'))) ws.send(JSON.stringify({type:'liar-reset'}));
+    });
+    return;
+  }
+
+  // PLAYING / REVEAL / SHOOTING
+  // If I'm eliminated, show banner + log
+  if (me && me.eliminated) {
+    c.innerHTML = `
+      <div class="liar-info">
+        <div class="liar-label" data-i18n="liar.current_rank">Current rank</div>
+        <div class="liar-rank">${s.currentRank || '—'}</div>
+      </div>
+      <div class="eliminated-banner">${t('liar.eliminated')} 💀</div>
+      ${renderPlayerList()}
+    `;
+    I18N.apply();
+    return;
+  }
+
+  // Determine whose turn (skip eliminated)
+  const aliveOrder = (s.order||[]).filter(id => s.players[id] && !s.players[id].eliminated);
+  const currentId = aliveOrder.length ? aliveOrder[s.turnIdx % aliveOrder.length] : null;
+  const isMyTurn = currentId === myId;
+
+  // SHOOTING phase
+  if (phase === 'shooting') {
+    const shooter = s.players[s.shooter];
+    const isMeShooting = s.shooter === myId;
+    let body = '';
+    if (isMeShooting) {
+      body = `
+        <div class="trigger-wrap" id="trigger-wrap">
+          <div class="trigger-title" id="trig-status">${t('liar.point_chin')}</div>
+          <div class="trigger-name">${escapeHtml(shooter ? shooter.name : '')}</div>
+          <div class="trigger-risk">${t('liar.chambers')}: <b>${s.chambers}</b> · ${t('liar.bullet_risk')}: <b>1/${s.chambers}</b></div>
+          <div id="trig-icon" style="font-size:72px;margin:20px 0;transition:transform .2s">📱</div>
+          <div id="trig-bar" style="height:8px;background:rgba(255,255,255,.1);border-radius:4px;overflow:hidden;margin:12px 0">
+            <div id="trig-fill" style="height:100%;width:0%;background:linear-gradient(90deg,#ffb347,#ff6170);transition:width .15s"></div>
+          </div>
+          <div id="trig-timer" style="font-size:14px;opacity:.7;margin-top:8px">${t('liar.timeout_in')}: <b id="trig-secs">10</b>s</div>
+          <button id="btn-perm" class="trigger-btn" style="display:none">${t('liar.enable_motion')}</button>
+        </div>
+      `;
+    } else {
+      body = `
+        <div class="trigger-wrap" style="border-color:rgba(255,97,112,.3)">
+          <div class="trigger-title">${t('liar.waiting')}</div>
+          <div class="trigger-name">${escapeHtml(shooter ? shooter.name : '')}</div>
+          <div class="trigger-risk">${t('liar.chambers')}: <b>${s.chambers}</b> · ${t('liar.bullet_risk')}: <b>1/${s.chambers}</b></div>
+        </div>
+      `;
+    }
+    c.innerHTML = body + renderPlayerList();
+    if (isMeShooting) initChinTrigger();
+    return;
+  }
+
+  // ============== CHIN-DETECTION TRIGGER (gyroscope) ==============
+  // Phone vertical + still for 1s → arms → random 0-5s → fires.
+  // Hard timeout: 10s from start, fires no matter what.
+  function initChinTrigger() {
+    if (window.__chinTriggerActive) return;
+    window.__chinTriggerActive = true;
+    let fired = false;
+    let beta = 0, gamma = 0;
+    let lastAccel = 0;
+    let stillStart = null;
+    let armed = false;
+    let armedAt = 0;
+    let fireAt = 0;
+    let lastHeartbeat = 0;
+    const startedAt = Date.now();
+    const HARD_TIMEOUT = 10000;
+    const STILL_MS = 1000;
+
+    const statusEl = $('#trig-status');
+    const iconEl   = $('#trig-icon');
+    const fillEl   = $('#trig-fill');
+    const secsEl   = $('#trig-secs');
+    const wrapEl   = $('#trigger-wrap');
+
+    function fire() {
+      if (fired) return;
+      fired = true;
+      window.__chinTriggerActive = false;
+      window.removeEventListener('deviceorientation', onOrient);
+      window.removeEventListener('devicemotion', onMotion);
+      ws.send(JSON.stringify({type:'liar-pull-trigger'}));
+      if (statusEl) statusEl.textContent = '💥 ' + t('liar.firing');
+      if (iconEl) iconEl.textContent = '💥';
+      // Heavy "recoil" vibration burst
+      try { if (navigator.vibrate) navigator.vibrate([400, 100, 200, 100, 150]); } catch(e){}
+      // Recoil visual: violent shake
+      if (wrapEl) {
+        wrapEl.style.transition = 'transform .08s';
+        wrapEl.style.transform = 'translateY(-30px) rotate(-3deg)';
+        setTimeout(() => { wrapEl.style.transform = 'translateY(10px) rotate(2deg)'; }, 80);
+        setTimeout(() => { wrapEl.style.transform = 'translate(0,0) rotate(0deg)'; }, 200);
+      }
+      // Flash phone screen red briefly
+      const flash = document.createElement('div');
+      flash.style.cssText = 'position:fixed;inset:0;background:#ff0033;z-index:9999;pointer-events:none;opacity:.85;';
+      document.body.appendChild(flash);
+      setTimeout(() => {
+        flash.style.transition = 'opacity .35s';
+        flash.style.opacity = '0';
+      }, 80);
+      setTimeout(() => flash.remove(), 500);
+    }
+
+    function onOrient(e) { beta = e.beta || 0; gamma = e.gamma || 0; }
+    function onMotion(e) {
+      const a = e.accelerationIncludingGravity || e.acceleration || {x:0,y:0,z:0};
+      const mag = Math.sqrt((a.x||0)**2 + (a.y||0)**2 + (a.z||0)**2);
+      lastAccel = Math.abs(mag - 9.8);
+    }
+
+    function attachSensors() {
+      window.addEventListener('deviceorientation', onOrient);
+      window.addEventListener('devicemotion', onMotion);
+    }
+    const needsPerm = typeof DeviceOrientationEvent !== 'undefined'
+      && typeof DeviceOrientationEvent.requestPermission === 'function';
+    if (needsPerm) {
+      const btn = $('#btn-perm');
+      if (btn) {
+        btn.style.display = 'block';
+        btn.addEventListener('click', async () => {
+          try {
+            await DeviceOrientationEvent.requestPermission();
+            if (typeof DeviceMotionEvent !== 'undefined' && typeof DeviceMotionEvent.requestPermission === 'function') {
+              await DeviceMotionEvent.requestPermission();
+            }
+            btn.style.display = 'none';
+            attachSensors();
+          } catch (e) { btn.textContent = '⚠️ ' + e.message; }
+        });
+      }
+    } else {
+      attachSensors();
+    }
+
+    const loop = setInterval(() => {
+      if (fired) { clearInterval(loop); return; }
+      const elapsed = Date.now() - startedAt;
+      const remain = Math.max(0, HARD_TIMEOUT - elapsed);
+      if (secsEl) secsEl.textContent = Math.ceil(remain/1000);
+
+      if (elapsed >= HARD_TIMEOUT) { fire(); clearInterval(loop); return; }
+
+      if (!armed) {
+        const isVertical = Math.abs(beta - 90) < 25 && Math.abs(gamma) < 35;
+        const isStill = lastAccel < 1.5;
+        if (isVertical && isStill) {
+          if (stillStart === null) stillStart = Date.now();
+          const held = Date.now() - stillStart;
+          if (fillEl) fillEl.style.width = Math.min(100, (held/STILL_MS)*100) + '%';
+          if (statusEl) statusEl.textContent = t('liar.hold_still');
+          if (iconEl) iconEl.style.transform = 'rotate(0deg) scale(1.1)';
+          if (held >= STILL_MS) {
+            armed = true;
+            armedAt = Date.now();
+            fireAt = Date.now() + Math.floor(Math.random() * 5000);
+            if (statusEl) statusEl.textContent = '🎯 ' + t('liar.armed');
+            if (fillEl) { fillEl.style.background = 'linear-gradient(90deg,#ff6170,#ff0033)'; fillEl.style.width = '100%'; }
+            // Switch to "armed" cinematic mode: red overlay
+            if (wrapEl) {
+              wrapEl.style.background = 'linear-gradient(180deg,rgba(160,15,15,.4),rgba(60,5,5,.3))';
+              wrapEl.style.borderColor = '#ff0033';
+              wrapEl.style.boxShadow = '0 0 60px rgba(255,0,51,.5)';
+              wrapEl.style.transition = 'all .4s';
+            }
+            try { SFX.hammerCock(); } catch(e){}
+          }
+        } else {
+          stillStart = null;
+          if (fillEl) fillEl.style.width = '0%';
+          if (statusEl) statusEl.textContent = t('liar.point_chin');
+          if (iconEl) iconEl.style.transform = 'rotate(-15deg)';
+        }
+      } else {
+        // Armed: heartbeat that speeds up as fire approaches
+        if (Date.now() >= fireAt) { fire(); clearInterval(loop); return; }
+        const timeToFire = fireAt - Date.now();
+        // Heartbeat interval: 900ms when far, 300ms when imminent
+        const hbInterval = Math.max(300, Math.min(900, timeToFire * 0.5));
+        if (Date.now() - lastHeartbeat > hbInterval) {
+          lastHeartbeat = Date.now();
+          try { SFX.heartbeat(); } catch(e){}
+          try { if (navigator.vibrate) navigator.vibrate(60); } catch(e){}
+        }
+        if (iconEl) iconEl.style.transform = 'scale(' + (1 + Math.random()*0.15) + ')';
+      }
+    }, 100);
+  }
+
+  // REVEAL phase: lastPlay shown + believe/bluff buttons
+  if (phase === 'reveal' && s.lastPlay) {
+    const isResponder = currentId === myId;  // next player after the play
+    const playerWhoPlayed = s.players[s.lastPlay.by];
+    let body = `
+      <div class="liar-info">
+        <div class="liar-label" data-i18n="liar.current_rank">Current rank</div>
+        <div class="liar-rank">${s.currentRank || '—'}</div>
+      </div>
+      <div class="liar-status">
+        <div style="font-family:'Bodoni Moda';font-style:italic;font-size:15px;color:var(--ink);margin-bottom:4px;">
+          ${escapeHtml(playerWhoPlayed ? playerWhoPlayed.name : '')} ${t('liar.table_says')} ${s.lastPlay.count}× ${s.currentRank}
+        </div>
+      </div>
+    `;
+    if (isResponder) {
+      body += `
+        <div class="btn-row">
+          <button class="btn-believe" id="btn-believe">${t('liar.believe')}</button>
+          <button class="btn-bluff" id="btn-bluff">${t('liar.bluff')}</button>
+        </div>
+      `;
+    } else {
+      const responderName = s.players[currentId]?.name || '—';
+      body += `<div class="liar-status">${t('liar.waiting')}: ${escapeHtml(responderName)}</div>`;
+    }
+    c.innerHTML = body + renderPlayerList();
+    const bb = $('#btn-believe'); if (bb) bb.addEventListener('click', () => ws.send(JSON.stringify({type:'liar-believe'})));
+    const bl = $('#btn-bluff');   if (bl) bl.addEventListener('click', () => ws.send(JSON.stringify({type:'liar-bluff'})));
+    return;
+  }
+
+  // PLAYING phase
+  if (phase === 'playing') {
+    // Are we choosing a loser? (after bluff revealed) — server sets phase='who_lost' but we use a flag
+    // Actually let's check: if state.needLoserPick is true, show pick list
+    if (s.needLoserPick) {
+      const picks = aliveOrder.map(id => {
+        const p = s.players[id];
+        return `<button class="loser-pick-btn" data-target="${id}"><span class="dot" style="background:${p.color};color:${p.color}"></span>${escapeHtml(p.name)}</button>`;
+      }).join('');
+      c.innerHTML = `
+        <div class="liar-info"><div class="liar-label">${t('liar.who_lost')}</div></div>
+        <div class="loser-pick-title">${t('liar.who_lost')}</div>
+        <div class="loser-pick-sub">${t('liar.who_lost_sub')}</div>
+        <div class="loser-list">${picks}</div>
+      `;
+      document.querySelectorAll('.loser-pick-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          if (confirm(btn.textContent.trim() + ' ?')) {
+            ws.send(JSON.stringify({type:'liar-declare-loser', target: btn.dataset.target}));
+          }
+        });
+      });
+      return;
+    }
+
+    let body = `
+      <div class="liar-info">
+        <div class="liar-label" data-i18n="liar.current_rank">Current rank</div>
+        <div class="liar-rank">${s.currentRank || '—'}</div>
+      </div>
+    `;
+    if (isMyTurn) {
+      body += `
+        <div class="liar-status your-turn">${t('liar.your_turn')}</div>
+        <div class="section-title" style="text-align:center;color:var(--purpleb)">${t('liar.tap_count')}</div>
+        <div class="card-count-row">
+          ${[1,2,3,4].map(n=>`<button class="cc-btn ${n===liarSelectedCount?'active':''}" data-cnt="${n}">${n}</button>`).join('')}
+        </div>
+        <button class="btn-play" id="btn-play">${t('liar.play_n').replace('%N%', liarSelectedCount)}</button>
+      `;
+    } else {
+      const tname = s.players[currentId]?.name || '—';
+      body += `<div class="liar-status">${t('liar.waiting')}: ${escapeHtml(tname)}</div>`;
+    }
+    c.innerHTML = body + renderPlayerList();
+    document.querySelectorAll('.cc-btn').forEach(b => {
+      b.addEventListener('click', () => {
+        liarSelectedCount = parseInt(b.dataset.cnt);
+        document.querySelectorAll('.cc-btn').forEach(x => x.classList.remove('active'));
+        b.classList.add('active');
+        $('#btn-play').textContent = t('liar.play_n').replace('%N%', liarSelectedCount);
+      });
+    });
+    const bp = $('#btn-play');
+    if (bp) bp.addEventListener('click', () => {
+      ws.send(JSON.stringify({type:'liar-play', count: liarSelectedCount}));
+    });
+    return;
+  }
+
+  c.innerHTML = '<div class="liar-status">' + phase.toUpperCase() + '</div>' + renderPlayerList();
+}
+
+function renderPlayerList() {
+  if (!liarState) return '';
+  const s = liarState;
+  const aliveOrder = (s.order||[]).filter(id => s.players[id] && !s.players[id].eliminated);
+  const currentId = aliveOrder.length ? aliveOrder[s.turnIdx % aliveOrder.length] : null;
+  const items = Object.keys(s.players).map(id => {
+    const p = s.players[id]; if (!p) return '';
+    const isTurn = id === currentId && (s.phase==='playing'||s.phase==='reveal');
+    const elim = p.eliminated;
+    return `<div class="loser-pick-btn" style="cursor:default;${isTurn?'border-color:'+p.color:''};${elim?'opacity:.4;filter:grayscale(.7)':''}">
+      <span class="dot" style="background:${p.color};color:${p.color}"></span>
+      <div style="flex:1">${escapeHtml(p.name)}${elim?' 💀':''}</div>
+    </div>`;
+  }).join('');
+  return `<div style="margin-top:14px;"><div class="section-title">${t('disp.players_at')}</div><div class="loser-list">${items}</div></div>`;
+}
+
+function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+
+document.addEventListener('langchange', () => {
+  if (state) applyRouletteState(state);
+  if (liarState) renderLiar();
+});
+
+// Auto-rejoin if already named
+if (savedName) {
+  // Don't auto-join — user might want to fix their name. But let them see the join screen pre-filled.
+}
+
+// ============== MINI-GAMES (Slot / Lucky / War) ==============
+let miniState = null;
+function applyMiniState(m) {
+  const prev = miniState;
+  miniState = m;
+  // Buzz when a new game starts
+  if (prev && m && prev.mode === 'idle' && m.mode !== 'idle') buzz([60, 40, 60]);
+  // Buzz when result drops if I had a bet
+  if (prev && m && prev.phase !== 'result' && m.phase === 'result' && m.bets[myId]) {
+    const myPay = (m.result && m.result.payouts && m.result.payouts[myId]) || 0;
+    if (myPay > 0) buzz([200,100,200,100,400]);
+    else buzz(120);
+  }
+  renderMini();
+}
+function renderMini() {
+  const c = $('#games-content'); if (!c) return;
+  const s = miniState;
+  if (!s || s.mode === 'idle') {
+    c.innerHTML = `<div style="text-align:center;padding:40px 16px;color:var(--ink-dim);font-style:italic;font-size:15px">${t('phone.games.none')}</div>`;
+    return;
+  }
+  const myBet = s.bets[myId];
+  const me = s.players[myId];
+  const myChips = me ? me.chips : 0;
+  const titleByMode = { slot:'🎰 ' + t('games.slot.title'), lucky:'🎯 ' + t('games.lucky.title'), war:'⚔️ ' + t('games.war.title'), horse:'🐎 ' + t('games.horse.title') };
+  let body = `
+    <div style="text-align:center;margin:14px 0">
+      <div style="font-size:11px;font-family:'JetBrains Mono',monospace;letter-spacing:.35em;color:var(--ink-dim)">${t('games.pot')}</div>
+      <div style="font-size:42px;font-weight:900;font-style:italic;color:var(--gold)">${(s.pot||0).toLocaleString()}</div>
+      <div style="font-size:22px;font-style:italic;margin-top:6px">${titleByMode[s.mode]||''}</div>
+    </div>
+  `;
+  if (s.phase === 'betting') {
+    let pickerHtml = '';
+    if (s.mode === 'lucky') {
+      pickerHtml = `
+        <div style="font-size:11px;font-family:'JetBrains Mono',monospace;letter-spacing:.3em;color:var(--ink-dim);margin:12px 0 8px">${t('phone.games.pick_lbl')}</div>
+        <input type="number" id="bet-pick" min="1" max="100" value="${myBet ? (myBet.pick || 50) : 50}" style="width:100%;padding:12px;background:rgba(0,0,0,.4);border:1px solid var(--line);color:var(--ink);font-size:18px;border-radius:6px;text-align:center">
+      `;
+    } else if (s.mode === 'horse') {
+      const horses = s.horses || [];
+      const myPick = myBet && myBet.pick;
+      pickerHtml = `
+        <div style="font-size:11px;font-family:'JetBrains Mono',monospace;letter-spacing:.3em;color:var(--ink-dim);margin:12px 0 8px">${t('phone.games.pick_horse')}</div>
+        <div id="horse-picker" style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          ${horses.map(h => `<button type="button" data-horse="${h.id}" style="padding:14px 8px;background:${myPick===h.id?'rgba(212,175,55,.25)':'rgba(0,0,0,.4)'};border:1px solid ${myPick===h.id?'var(--gold)':'var(--line)'};color:${h.color};border-radius:8px;font-family:'JetBrains Mono',monospace;font-weight:800;font-size:13px;letter-spacing:.1em;text-align:center;cursor:pointer">${h.emoji} ${h.name}</button>`).join('')}
+        </div>
+        <input type="hidden" id="bet-pick" value="${myPick||''}">
+      `;
+    }
+    body += `
+      <div style="background:rgba(0,0,0,.3);border:1px solid var(--line);border-radius:10px;padding:14px;margin:14px 0">
+        <div style="font-size:11px;font-family:'JetBrains Mono',monospace;letter-spacing:.3em;color:var(--ink-dim);margin-bottom:8px">${t('phone.games.bet_lbl')}</div>
+        <input type="number" id="bet-amt" min="1" max="${myChips}" value="${myBet ? myBet.amount : 25}" style="width:100%;padding:12px;background:rgba(0,0,0,.4);border:1px solid var(--line);color:var(--ink);font-size:18px;border-radius:6px;text-align:center">
+        ${pickerHtml}
+        <button id="bet-go" style="width:100%;margin-top:14px;padding:14px;background:linear-gradient(180deg,var(--gold-bright),var(--gold));color:#0a0604;border:none;border-radius:6px;font-size:15px;font-weight:900;letter-spacing:.2em;text-transform:uppercase">${myBet ? t('phone.games.update') : t('phone.games.place')}</button>
+        ${myBet ? `<div style="text-align:center;margin-top:8px;font-size:13px;color:var(--gold)">✓ ${t('phone.games.placed')}: ${myBet.amount}${myBet.pick?(' · '+(s.mode==='horse'?((s.horses||[]).find(h=>h.id===myBet.pick)||{}).name||myBet.pick:'#'+myBet.pick)):''}</div>`:''}
+      </div>
+    `;
+  } else if (s.phase === 'playing') {
+    body += `<div style="text-align:center;padding:30px;font-style:italic;color:var(--ink-dim)">${t('phone.games.waiting')}</div>`;
+  } else if (s.phase === 'result' && s.result) {
+    const pay = (s.result.payouts && s.result.payouts[myId]) || 0;
+    if (myBet) {
+      const won = pay > 0;
+      body += `<div style="text-align:center;padding:30px 16px;background:${won?'linear-gradient(180deg,rgba(212,175,55,.2),rgba(0,0,0,.3))':'rgba(0,0,0,.3)'};border:1px solid ${won?'var(--gold)':'var(--line)'};border-radius:12px;margin:14px 0">
+        <div style="font-size:24px;font-weight:900;font-style:italic;color:${won?'var(--gold-bright)':'var(--ink-dim)'}">${won?'🎉 '+t('phone.games.you_won'):t('phone.games.you_lost')}</div>
+        ${won?`<div style="font-size:32px;font-weight:900;color:var(--gold);margin-top:8px">+${pay}</div>`:''}
+        ${s.mode==='war' && s.warCards[myId]?`<div style="margin-top:12px;font-size:14px;color:var(--ink-dim)">${t('phone.games.your_card')}: <b style="font-size:20px;color:${(s.warCards[myId].suit==='♥'||s.warCards[myId].suit==='♦')?'#ff6170':'#fff'}">${s.warCards[myId].rank}${s.warCards[myId].suit}</b></div>`:''}
+      </div>`;
+    }
+  }
+  c.innerHTML = body;
+  // Wire bet button
+  const go = $('#bet-go');
+  if (go) go.addEventListener('click', () => {
+    const amt = parseInt($('#bet-amt').value, 10) || 0;
+    const pickEl = $('#bet-pick');
+    let pick;
+    if (pickEl) {
+      if (s.mode === 'lucky') pick = Math.max(1, Math.min(100, parseInt(pickEl.value, 10)||50));
+      else if (s.mode === 'horse') {
+        pick = pickEl.value;
+        if (!pick) { alert(t('phone.games.pick_horse_warn')); return; }
+      }
+    }
+    if (amt < 1 || amt > myChips) { alert('Invalid amount'); return; }
+    ws.send(JSON.stringify({ type:'mini-bet', amount: amt, pick }));
+    go.style.opacity = .5; go.disabled = true;
+  });
+  // Wire horse picker
+  document.querySelectorAll('#horse-picker button').forEach(b => b.addEventListener('click', () => {
+    const hid = b.dataset.horse;
+    $('#bet-pick').value = hid;
+    document.querySelectorAll('#horse-picker button').forEach(x => {
+      x.style.background = 'rgba(0,0,0,.4)';
+      x.style.borderColor = 'var(--line)';
+    });
+    b.style.background = 'rgba(212,175,55,.25)';
+    b.style.borderColor = 'var(--gold)';
+  }));
+}
+// Listen to language change
+window.addEventListener('langchange', renderMini);
+</script>
+</body>
+</html>

@@ -1,0 +1,249 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title data-i18n-doctitle="brand.title">Maison de la Roue · Table</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,700;0,6..96,900;1,6..96,700;1,6..96,900&family=JetBrains+Mono:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#06060a;--bg-2:#0e0a14;--ink:#f5ead0;--ink-dim:#a99e86;--gold:#d4af37;--gold-bright:#f0cc5a;--red:#b6122a;}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;background:var(--bg);color:var(--ink);font-family:"Bodoni Moda",serif;overflow:hidden;}
+body{background:radial-gradient(1400px 700px at 50% -20%,rgba(212,175,55,.14),transparent 70%),radial-gradient(1000px 600px at 100% 120%,rgba(182,18,42,.18),transparent 70%),var(--bg);position:relative;}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;background-image:radial-gradient(rgba(255,255,255,.03) 1px,transparent 1px);background-size:3px 3px;mix-blend-mode:overlay;opacity:.5;}
+.top{position:absolute;top:0;left:0;right:0;padding:22px 40px;display:flex;justify-content:space-between;align-items:center;z-index:5;padding-right:160px;}
+.brand{font-weight:900;font-style:italic;font-size:34px;line-height:1;letter-spacing:.02em;
+  background:linear-gradient(180deg,var(--gold-bright),var(--gold) 60%,#8a6e1c);-webkit-background-clip:text;background-clip:text;color:transparent;text-shadow:0 0 40px rgba(212,175,55,.2);}
+.brand small{display:block;font-family:"JetBrains Mono",monospace;font-style:normal;font-weight:600;font-size:11px;letter-spacing:.4em;color:var(--ink-dim);margin-top:4px;}
+.phase-badge{font-family:"JetBrains Mono",monospace;font-weight:800;font-size:12px;letter-spacing:.4em;text-transform:uppercase;
+  padding:10px 18px;border-radius:4px;border:1px solid rgba(212,175,55,.4);color:var(--gold);background:rgba(0,0,0,.3);backdrop-filter:blur(8px);}
+.phase-badge.spinning{color:var(--gold-bright);border-color:var(--gold-bright);animation:glow 1.2s ease-in-out infinite alternate;}
+.phase-badge.payout{color:#f8c5a5;border-color:rgba(248,197,165,.5);}
+@keyframes glow{to{box-shadow:0 0 25px rgba(240,204,90,.6);}}
+.stage{position:absolute;inset:0;display:grid;grid-template-columns:1fr 340px;grid-template-rows:1fr;padding-top:80px;}
+.board{position:relative;display:flex;align-items:center;justify-content:center;padding:10px 30px 20px;}
+.side{padding:20px 30px 30px 0;overflow:hidden;display:flex;flex-direction:column;gap:14px;min-width:0;}
+.wheel-wrap{position:relative;width:min(52vmin,560px);aspect-ratio:1/1;display:flex;align-items:center;justify-content:center;}
+.wheel-outer{position:absolute;inset:0;border-radius:50%;
+  background:conic-gradient(from -90deg,#3a2810,#7a5825,#d4af37,#f0cc5a,#d4af37,#7a5825,#3a2810,#7a5825,#d4af37,#f0cc5a,#d4af37,#7a5825,#3a2810);
+  padding:10px;box-shadow:0 0 0 2px rgba(0,0,0,.6),0 20px 60px rgba(0,0,0,.7),0 0 120px rgba(212,175,55,.18);}
+.wheel-inner-bg{position:absolute;inset:16px;border-radius:50%;background:#0b0708;box-shadow:inset 0 0 50px rgba(0,0,0,.8);}
+#wheel-canvas{position:absolute;inset:20px;border-radius:50%;transform-origin:center;transition:transform 6s cubic-bezier(.17,.67,.18,1.02);filter:drop-shadow(0 10px 30px rgba(0,0,0,.5));}
+.wheel-hub{position:absolute;width:22%;aspect-ratio:1/1;border-radius:50%;
+  background:radial-gradient(circle at 35% 30%,#f0cc5a,#8a6e1c 60%,#3a2810);
+  box-shadow:0 8px 20px rgba(0,0,0,.6),inset 0 -4px 10px rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center;
+  font-family:"Bodoni Moda",serif;font-weight:900;font-style:italic;font-size:22px;color:#2a1f06;z-index:3;}
+.pointer{position:absolute;top:-4px;left:50%;transform:translateX(-50%);width:0;height:0;
+  border-left:14px solid transparent;border-right:14px solid transparent;border-top:26px solid var(--gold-bright);filter:drop-shadow(0 3px 6px rgba(0,0,0,.6));z-index:4;}
+.result-overlay{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) scale(.8);opacity:0;pointer-events:none;
+  transition:all .5s cubic-bezier(.2,.9,.3,1.3);text-align:center;z-index:6;}
+.result-overlay.show{opacity:1;transform:translate(-50%,-50%) scale(1);}
+.result-big{width:200px;height:200px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-family:"Bodoni Moda",serif;font-style:italic;font-weight:900;font-size:96px;color:#fff;
+  box-shadow:0 0 80px rgba(212,175,55,.4),0 20px 50px rgba(0,0,0,.7),inset 0 -10px 20px rgba(0,0,0,.4);margin:0 auto 20px;}
+.result-big.red{background:radial-gradient(circle at 30% 30%,#ef3a58,#8a0c1f);}
+.result-big.black{background:radial-gradient(circle at 30% 30%,#403848,#0b080d);}
+.result-big.green{background:radial-gradient(circle at 30% 30%,#2fbd7a,#053d21);}
+.result-label{font-family:"JetBrains Mono",monospace;font-weight:800;font-size:14px;letter-spacing:.5em;text-transform:uppercase;color:var(--ink);
+  padding:8px 20px;background:rgba(0,0,0,.6);border:1px solid rgba(212,175,55,.4);border-radius:4px;display:inline-block;}
+.panel{background:linear-gradient(180deg,rgba(255,255,255,.02),rgba(0,0,0,.3)),var(--bg-2);border:1px solid rgba(212,175,55,.25);
+  border-radius:12px;padding:16px 18px;box-shadow:0 20px 40px -20px rgba(0,0,0,.8),inset 0 1px 0 rgba(255,255,255,.04);}
+h3.section{font-family:"JetBrains Mono",monospace;font-size:10px;font-weight:800;letter-spacing:.4em;text-transform:uppercase;color:var(--gold);margin-bottom:10px;}
+.players-list{display:flex;flex-direction:column;gap:10px;max-height:360px;overflow:auto;}
+.player-row{display:flex;align-items:center;gap:12px;padding:8px 10px;border-radius:8px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.04);position:relative;overflow:hidden;}
+.player-row.leader{border-color:rgba(212,175,55,.5);background:rgba(212,175,55,.06);}
+.player-row.leader::before{content:"♛";position:absolute;top:4px;right:8px;color:var(--gold);font-size:14px;}
+.player-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;box-shadow:0 0 10px currentColor;}
+.player-name{flex:1;font-family:"Bodoni Moda",serif;font-style:italic;font-weight:700;font-size:18px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.player-chips{font-family:"JetBrains Mono",monospace;font-weight:800;font-size:15px;color:var(--gold-bright);}
+.history-row{display:flex;gap:6px;flex-wrap:wrap;}
+.hist-num{width:36px;height:36px;border-radius:6px;display:flex;align-items:center;justify-content:center;
+  font-family:"JetBrains Mono",monospace;font-weight:800;font-size:14px;color:#fff;box-shadow:inset 0 -3px 8px rgba(0,0,0,.4);}
+.hist-num.red{background:#b6122a;}.hist-num.black{background:#1a1420;border:1px solid #3a2f45;}.hist-num.green{background:#0e6b3a;}
+.connect-panel{padding:14px 16px;background:rgba(212,175,55,.06);border:1px solid rgba(212,175,55,.3);border-radius:12px;text-align:center;}
+.connect-label{font-family:"JetBrains Mono",monospace;font-size:9px;letter-spacing:.4em;color:var(--gold);text-transform:uppercase;margin-bottom:6px;}
+.connect-url{font-family:"JetBrains Mono",monospace;font-weight:800;font-size:16px;color:var(--ink);word-break:break-all;}
+.connect-hint{font-family:"Bodoni Moda",serif;font-style:italic;font-size:12px;color:var(--ink-dim);margin-top:6px;}
+.stage.spinning .side{opacity:.5;filter:blur(1px);transition:all .4s;}
+.stage.spinning .board .wheel-wrap{filter:drop-shadow(0 0 60px rgba(240,204,90,.3));}
+@keyframes winFlash{0%{box-shadow:0 0 0 0 rgba(240,204,90,0);}50%{box-shadow:0 0 0 30px rgba(240,204,90,.18),0 0 80px rgba(240,204,90,.6);}100%{box-shadow:0 0 0 0 rgba(240,204,90,0);}}
+.wheel-wrap.flashing{animation:winFlash 1.4s;}
+</style></head>
+<body>
+
+<div class="top">
+  <div class="brand">
+    <span data-i18n="brand.title">Maison de la Roue</span>
+    <small data-i18n="brand.table">Table № 1</small>
+  </div>
+  <div class="phase-badge" id="phase-badge" data-i18n="disp.phase.bet">PLACEZ VOS MISES</div>
+</div>
+
+<div class="stage" id="stage">
+  <div class="board">
+    <div class="wheel-wrap" id="wheel-wrap">
+      <div class="wheel-outer"></div>
+      <div class="wheel-inner-bg"></div>
+      <div class="pointer"></div>
+      <canvas id="wheel-canvas" width="800" height="800"></canvas>
+      <div class="wheel-hub">M·R</div>
+      <div class="result-overlay" id="result-overlay">
+        <div class="result-big" id="result-big">0</div>
+        <div class="result-label" id="result-label" data-i18n="disp.closed">ROUND CLOSED</div>
+      </div>
+    </div>
+  </div>
+
+  <aside class="side">
+    <div class="connect-panel">
+      <div class="connect-label" data-i18n="disp.join">◆ Join from your phone</div>
+      <div class="connect-url" id="connect-url">http://[your-ip]:3000</div>
+      <canvas id="qr" style="display:block;margin:10px auto 4px;background:#fff;border-radius:6px;max-width:160px;width:100%;height:auto"></canvas>
+      <div class="connect-hint" data-i18n="disp.scan_qr">Scan with your camera</div>
+    </div>
+    <div class="panel" style="flex:1;min-height:0;display:flex;flex-direction:column">
+      <h3 class="section" data-i18n="disp.players_at">◆ Players at the table</h3>
+      <div class="players-list" id="players-list">
+        <div style="color:var(--ink-dim);font-style:italic;text-align:center;padding:20px 0" data-i18n="disp.awaiting">Awaiting guests…</div>
+      </div>
+    </div>
+    <div class="panel">
+      <h3 class="section" data-i18n="disp.recent_spins">◆ Recent spins</h3>
+      <div class="history-row" id="history">
+        <div style="color:var(--ink-dim);font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.2em" data-i18n="phone.none_yet">NONE YET</div>
+      </div>
+    </div>
+  </aside>
+</div>
+
+<script src="/qr.js"></script>
+<script src="/i18n.js"></script>
+<script src="/lang-switcher.js"></script>
+<script>
+I18N.init();
+
+const WHEEL_ORDER = [0,32,15,19,4,21,2,25,17,34,6,27,13,36,11,30,8,23,10,5,24,16,33,1,20,14,31,9,22,18,29,7,28,12,35,3,26];
+const RED_NUMBERS = new Set([1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36]);
+const colorOf = n => n === 0 ? 'green' : RED_NUMBERS.has(n) ? 'red' : 'black';
+
+const canvas = document.getElementById('wheel-canvas');
+const ctx = canvas.getContext('2d');
+const SLOTS = WHEEL_ORDER.length;
+const ANGLE = (Math.PI*2)/SLOTS;
+
+function drawWheel() {
+  const w = canvas.width, h = canvas.height, cx = w/2, cy = h/2, r = w/2 - 4;
+  ctx.clearRect(0,0,w,h);
+  for (let i=0; i<SLOTS; i++) {
+    const num = WHEEL_ORDER[i], c = colorOf(num);
+    const a0 = -Math.PI/2 + i*ANGLE - ANGLE/2, a1 = a0 + ANGLE;
+    ctx.beginPath(); ctx.moveTo(cx,cy); ctx.arc(cx,cy,r,a0,a1); ctx.closePath();
+    ctx.fillStyle = c==='red' ? '#b6122a' : c==='black' ? '#1a1420' : '#0e6b3a';
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(212,175,55,.55)'; ctx.lineWidth = 1; ctx.stroke();
+    ctx.save(); ctx.translate(cx,cy); ctx.rotate(-Math.PI/2 + i*ANGLE);
+    ctx.fillStyle = '#f5ead0'; ctx.font = 'bold 28px "JetBrains Mono", monospace';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText(String(num), 0, -r + 36); ctx.restore();
+  }
+  ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2);
+  ctx.strokeStyle = 'rgba(212,175,55,.8)'; ctx.lineWidth = 3; ctx.stroke();
+}
+drawWheel();
+
+let cumulativeRotation = 0;
+function spinTo(winningNumber) {
+  const idx = WHEEL_ORDER.indexOf(winningNumber);
+  if (idx < 0) return;
+  const slotAngle = 360/SLOTS;
+  const turns = 6 + Math.random()*2;
+  const targetAngle = (360 - idx*slotAngle);
+  const base = cumulativeRotation;
+  let next = Math.ceil((base + turns*360)/360)*360 + targetAngle;
+  if (next <= base) next += 360;
+  cumulativeRotation = next;
+  canvas.style.transform = 'rotate(' + cumulativeRotation + 'deg)';
+  // Audio: ball rolling clicks
+  let clicks = 0;
+  const total = 18;
+  const playClick = () => {
+    SFX.ball();
+    clicks++;
+    if (clicks < total) setTimeout(playClick, 100 + clicks*30);
+  };
+  playClick();
+}
+
+let ws, state = null;
+function connect() {
+  const proto = location.protocol==='https:'?'wss':'ws';
+  ws = new WebSocket(proto+'://'+location.host);
+  ws.onopen = () => {
+    ws.send(JSON.stringify({type:'display-hello'}));
+    const joinUrl = location.origin + '/phone';
+    document.getElementById('connect-url').textContent = joinUrl;
+    try { QR.draw(document.getElementById('qr'), joinUrl, {scale:6, margin:2}); } catch(e){ console.warn('QR:', e); }
+  };
+  ws.onclose = () => setTimeout(connect, 1200);
+  ws.onmessage = e => {
+    const msg = JSON.parse(e.data);
+    if (msg.type === 'state') applyState(msg);
+    if (msg.type === 'spin-start') onSpinStart(msg.winner);
+    if (msg.type === 'spin-end') onSpinEnd(msg.result);
+  };
+}
+
+function applyState(s) {
+  state = s;
+  const badge = document.getElementById('phase-badge');
+  badge.className = 'phase-badge ' + s.phase;
+  badge.textContent = s.phase==='betting' ? t('disp.phase.bet')
+                    : s.phase==='spinning' ? t('disp.phase.spin')
+                    : t('disp.phase.end');
+  document.getElementById('stage').classList.toggle('spinning', s.phase==='spinning');
+  const overlay = document.getElementById('result-overlay');
+  if (s.phase==='payout' && s.lastResult) {
+    const big = document.getElementById('result-big');
+    big.textContent = s.lastResult.number;
+    big.className = 'result-big ' + s.lastResult.color;
+    document.getElementById('result-label').textContent = s.lastResult.color.toUpperCase() + ' · ' + t('disp.closed');
+    overlay.classList.add('show');
+  } else if (s.phase==='betting') overlay.classList.remove('show');
+
+  const list = document.getElementById('players-list');
+  const ids = Object.keys(s.players);
+  if (ids.length === 0) {
+    list.innerHTML = '<div style="color:var(--ink-dim);font-style:italic;text-align:center;padding:20px 0">' + t('disp.awaiting') + '</div>';
+  } else {
+    const sorted = ids.map(id => ({id, ...s.players[id]})).sort((a,b)=>b.chips-a.chips);
+    const leader = sorted[0]?.chips ?? 0;
+    list.innerHTML = sorted.map(p => `
+      <div class="player-row ${p.chips===leader && ids.length>1 ? 'leader':''}">
+        <span class="player-dot" style="background:${p.color};color:${p.color}"></span>
+        <div style="flex:1;min-width:0"><div class="player-name"><span style="font-size:18px;margin-right:4px">${p.avatar||'🎩'}</span>${escapeHtml(p.name)}</div></div>
+        <div class="player-chips">${p.chips.toLocaleString()}</div>
+      </div>
+    `).join('');
+  }
+  const h = document.getElementById('history');
+  if ((s.history||[]).length) {
+    h.innerHTML = s.history.slice().reverse().map(r => `<div class="hist-num ${r.color}">${r.number}</div>`).join('');
+  } else h.innerHTML = '<div style="color:var(--ink-dim);font-family:\'JetBrains Mono\',monospace;font-size:11px;letter-spacing:.2em">' + t('phone.none_yet') + '</div>';
+}
+
+function onSpinStart(winner) {
+  spinTo(winner);
+  document.getElementById('result-overlay').classList.remove('show');
+}
+function onSpinEnd(result) {
+  const wrap = document.getElementById('wheel-wrap');
+  wrap.classList.remove('flashing'); void wrap.offsetWidth; wrap.classList.add('flashing');
+  SFX.win();
+}
+function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+
+document.addEventListener('langchange', () => { if (state) applyState(state); });
+connect();
+</script>
+</body>
+</html>

@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title data-i18n-doctitle="admin.title">Panneau Maître du Jeu</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;800&display=swap" rel="stylesheet">
+<style>
+body{background:#0a0a0f;color:#f5ead0;font-family:"JetBrains Mono",monospace;padding:20px;margin:0;}
+h1{color:#f0cc5a;text-transform:uppercase;font-size:20px;border-bottom:1px solid #f0cc5a;padding-bottom:10px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;}
+.logout-btn{background:#b6122a;color:#fff;border:none;padding:6px 12px;font-size:11px;border-radius:4px;cursor:pointer;font-family:"JetBrains Mono";}
+.box{background:#141019;border:1px solid rgba(212,175,55,.25);padding:15px;border-radius:8px;margin-bottom:20px;}
+.box h2{font-size:14px;color:#f0cc5a;margin:0 0 10px;font-weight:800;letter-spacing:.1em;}
+button{background:#3a2f45;color:#fff;border:none;padding:8px 12px;border-radius:4px;font-family:"JetBrains Mono";cursor:pointer;margin-right:5px;margin-top:5px;font-weight:bold;}
+button:active{filter:brightness(1.2);}
+.btn-force{background:#f0cc5a;color:#000;width:100%;padding:15px;font-size:16px;margin-bottom:20px;border-radius:8px;}
+.btn-kick{background:#b6122a;}
+.btn-money{background:#0e6b3a;}
+.player-row{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #333;padding:10px 0;flex-wrap:wrap;gap:10px;}
+.numpad{display:grid;grid-template-columns:repeat(6,1fr);gap:5px;margin-top:10px;}
+.num-btn{background:#2a2530;border:1px solid rgba(212,175,55,.3);padding:15px 0;font-size:16px;border-radius:6px;}
+.num-btn.red{background:#b6122a;}
+.num-btn.green{background:#0e6b3a;grid-column:span 6;}
+select{width:100%;padding:10px;font-size:14px;background:#000;color:#fff;border:1px solid #f0cc5a;border-radius:6px;outline:none;font-family:"JetBrains Mono";}
+input[type=number]{width:80px;background:#000;color:#fff;border:1px solid #333;padding:8px;font-family:"JetBrains Mono";}
+.lock-screen{position:fixed;inset:0;background:#06060a;display:flex;align-items:center;justify-content:center;z-index:9999;flex-direction:column;padding:20px;text-align:center;}
+.lock-screen h2{color:#ff6170;font-size:22px;margin-bottom:10px;}
+.lock-screen p{color:#a99e86;font-size:13px;margin-bottom:20px;}
+.lock-screen a{color:#f0cc5a;text-decoration:none;border:1px solid #f0cc5a;padding:10px 20px;border-radius:6px;}
+</style>
+</head>
+<body>
+
+<div class="lock-screen" id="lock-screen" style="display:none;">
+  <h2 data-i18n="admin.lock.title">🔒 ACCÈS REFUSÉ</h2>
+  <p data-i18n="admin.lock.desc">Vous devez vous authentifier depuis le menu principal.</p>
+  <a href="/" data-i18n="admin.lock.back">← Retour au Menu</a>
+</div>
+
+<div id="admin-panel" style="display:none;">
+  <h1>
+    <span data-i18n="admin.title">Panneau Maître du Jeu (Secret)</span>
+    <button class="logout-btn" onclick="logout()" data-i18n="admin.logout">Déconnexion</button>
+  </h1>
+
+  <div class="box">
+    <h2 data-i18n="admin.mode">⚙️ MODE DE JEU</h2>
+    <select id="mode-select" onchange="ws.send(JSON.stringify({type:'admin-toggle-mode', mode:this.value}))">
+      <option value="virtual" data-i18n="admin.mode.virtual">Virtuel</option>
+      <option value="real" data-i18n="admin.mode.real">Réelle</option>
+    </select>
+  </div>
+
+  <div id="virtual-controls">
+    <button class="btn-force" onclick="ws.send(JSON.stringify({type:'force-spin'}))" data-i18n="admin.force">🏁 FORCER LE TIRAGE (Virtuel)</button>
+  </div>
+
+  <div id="real-controls" class="box" style="display:none;border-color:#f0cc5a;">
+    <h2 data-i18n="admin.submit">🎯 SAISIR LE RÉSULTAT</h2>
+    <p style="font-size:12px;color:#a99e86;margin:0 0 10px 0;" data-i18n="admin.tap_winner">Tapez le numéro sorti :</p>
+    <div class="numpad" id="admin-numpad"></div>
+  </div>
+
+  <div class="box">
+    <h2 data-i18n="admin.state">ÉTAT ACTUEL</h2>
+    <div><span data-i18n="admin.phase">Phase</span>: <span id="st-phase" style="color:#f0cc5a">-</span> | <span data-i18n="admin.timer">Timer</span>: <span id="st-time">-</span></div>
+  </div>
+
+  <div class="box">
+    <h2 data-i18n="admin.games">🎲 MINI-JEUX</h2>
+    <div id="mini-current" style="margin-bottom:10px;font-size:13px;color:#a99e86" data-i18n="admin.games.current">Jeu actuel</div>
+    <div style="display:flex;flex-wrap:wrap;gap:8px">
+      <button onclick="ws.send(JSON.stringify({type:'mini-start',mode:'slot'}))" data-i18n="admin.games.start_slot">🎰 Lancer Slot</button>
+      <button onclick="ws.send(JSON.stringify({type:'mini-start',mode:'lucky'}))" data-i18n="admin.games.start_lucky">🎯 Lancer Lucky</button>
+      <button onclick="ws.send(JSON.stringify({type:'mini-start',mode:'war'}))" data-i18n="admin.games.start_war">⚔️ Lancer Bataille</button>
+      <button onclick="ws.send(JSON.stringify({type:'mini-start',mode:'horse'}))" data-i18n="admin.games.start_horse">🐎 Lancer Course</button>
+      <button onclick="ws.send(JSON.stringify({type:'mini-resolve'}))" style="background:#d4af37;color:#0a0604" data-i18n="admin.games.resolve">▶ Résoudre</button>
+      <button onclick="ws.send(JSON.stringify({type:'mini-end'}))" data-i18n="admin.games.end">✕ Terminer</button>
+    </div>
+  </div>
+
+  <div class="box">
+    <h2 data-i18n="admin.players_h">JOUEURS</h2>
+    <div id="players" data-i18n="admin.no_players">Aucun joueur</div>
+  </div>
+</div>
+
+<script src="/i18n.js"></script>
+<script src="/lang-switcher.js"></script>
+<script>
+const ADMIN_PASSWORD = "casino2026";
+I18N.init();
+
+if (sessionStorage.getItem('admin_auth') !== 'ok') {
+  document.getElementById('lock-screen').style.display = 'flex';
+  throw new Error('Not authenticated');
+} else {
+  document.getElementById('admin-panel').style.display = 'block';
+}
+function logout() {
+  sessionStorage.removeItem('admin_auth');
+  window.location.href = '/';
+}
+
+const RED = new Set([1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36]);
+const numpad = document.getElementById('admin-numpad');
+numpad.innerHTML += `<button class="num-btn green" onclick="submitReal(0)">0</button>`;
+for (let i=1;i<=36;i++) numpad.innerHTML += `<button class="num-btn ${RED.has(i)?'red':''}" onclick="submitReal(${i})">${i}</button>`;
+
+function submitReal(num) {
+  if (confirm(t('admin.confirm_n').replace('%N%', num))) {
+    ws.send(JSON.stringify({type:'admin-submit-result', winner:num}));
+  }
+}
+
+let ws, state = null;
+function connect() {
+  ws = new WebSocket((location.protocol==='https:'?'wss':'ws')+'://'+location.host);
+  ws.onopen = () => { ws.send(JSON.stringify({type:'admin-hello', password:ADMIN_PASSWORD})); };
+  ws.onclose = () => setTimeout(connect, 1200);
+  ws.onmessage = e => {
+    const msg = JSON.parse(e.data);
+    if (msg.type === 'admin-denied') { alert(t('admin.denied')); logout(); return; }
+    if (msg.type === 'mini-state') {
+      const lbl = { idle:'—', slot:'🎰 Slot', lucky:'🎯 Lucky', war:'⚔️ War' }[msg.mode] || '—';
+      const ph = { idle:'', betting:' · mises ouvertes', playing:' · en cours', result:' · résultat' }[msg.phase] || '';
+      const el = document.getElementById('mini-current');
+      if (el) el.textContent = lbl + ph + ' · ' + (Object.keys(msg.bets||{}).length) + ' mises · pot ' + (msg.pot||0);
+    }
+    if (msg.type === 'state') {
+      state = msg;
+      document.getElementById('st-phase').textContent = msg.phase.toUpperCase();
+      document.getElementById('mode-select').value = msg.mode;
+      if (msg.mode === 'real') {
+        document.getElementById('real-controls').style.display = 'block';
+        document.getElementById('virtual-controls').style.display = 'none';
+      } else {
+        document.getElementById('real-controls').style.display = 'none';
+        document.getElementById('virtual-controls').style.display = 'block';
+      }
+      const list = document.getElementById('players');
+      const ids = Object.keys(msg.players);
+      if (ids.length === 0) list.textContent = t('admin.no_players');
+      else {
+        list.innerHTML = ids.map(id => `
+          <div class="player-row">
+            <div><strong>${msg.players[id].name}</strong></div>
+            <div style="display:flex;align-items:center;">
+              <input type="number" id="admin-chips-${id}" value="${msg.players[id].chips}" style="margin-right:5px;">
+              <button class="btn-money" onclick="ws.send(JSON.stringify({type:'admin-set-chips', target:'${id}', amount:document.getElementById('admin-chips-${id}').value}))">OK</button>
+              <button class="btn-kick" onclick="if(confirm(t('admin.confirm_kick'))) ws.send(JSON.stringify({type:'admin-kick', target:'${id}'}))">${t('admin.kick')}</button>
+            </div>
+          </div>
+        `).join('');
+      }
+    }
+  };
+}
+connect();
+
+setInterval(() => {
+  if (state && state.phase === 'betting') {
+    if (state.mode === 'real') document.getElementById('st-time').textContent = t('admin.real_wait');
+    else document.getElementById('st-time').textContent = Math.max(0, Math.ceil((state.spinDeadline - Date.now())/1000)) + 's';
+  } else document.getElementById('st-time').textContent = '-';
+}, 500);
+</script>
+</body>
+</html>

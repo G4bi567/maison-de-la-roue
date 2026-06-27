@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title data-i18n-doctitle="bank.title">La Banque · Maison de la Roue</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,wght@0,700;0,900;1,700&family=JetBrains+Mono:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#06060a;--bg2:#0e0a14;--ink:#f5ead0;--ink-dim:#a99e86;--gold:#d4af37;--goldb:#f0cc5a;--line:rgba(212,175,55,.25);--green:#8ef0b5;}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html,body{background:var(--bg);color:var(--ink);font-family:"Bodoni Moda",serif;min-height:100vh;}
+body{background:radial-gradient(900px 500px at 50% -10%,rgba(212,175,55,.18),transparent 70%),var(--bg);padding:20px 16px 60px;}
+.container{max-width:560px;margin:0 auto;}
+header{text-align:center;margin-bottom:25px;position:relative;}
+.back-btn{position:absolute;left:0;top:6px;background:rgba(0,0,0,.4);border:1px solid var(--line);color:var(--ink-dim);
+  padding:8px 14px;border-radius:8px;text-decoration:none;font-family:"JetBrains Mono",monospace;font-size:11px;font-weight:800;letter-spacing:.1em;}
+.brand{font-weight:900;font-style:italic;font-size:36px;
+  background:linear-gradient(180deg,var(--goldb),var(--gold) 60%,#8a6e1c);-webkit-background-clip:text;background-clip:text;color:transparent;}
+.brand small{display:block;font-family:"JetBrains Mono",monospace;font-style:normal;font-weight:600;font-size:11px;letter-spacing:.3em;color:var(--ink-dim);margin-top:8px;text-transform:uppercase;}
+.panel{background:linear-gradient(180deg,rgba(255,255,255,.02),rgba(0,0,0,.3)),var(--bg2);border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:16px;}
+.label{font-family:"JetBrains Mono",monospace;font-size:10px;font-weight:800;letter-spacing:.3em;text-transform:uppercase;color:var(--gold);margin-bottom:10px;display:block;}
+.input{width:100%;padding:14px;background:rgba(0,0,0,.5);border:1px solid var(--line);border-radius:10px;color:var(--ink);
+  font-family:"JetBrains Mono",monospace;font-weight:800;font-size:22px;text-align:center;outline:none;}
+.input:focus{border-color:var(--gold);}
+select.input{appearance:none;background-image:linear-gradient(45deg,transparent 50%,var(--goldb) 50%),linear-gradient(135deg,var(--goldb) 50%,transparent 50%);
+  background-position:calc(100% - 18px) 50%,calc(100% - 12px) 50%;background-size:6px 6px;background-repeat:no-repeat;padding-right:30px;}
+.result-box{background:linear-gradient(180deg,rgba(142,240,181,.08),rgba(0,0,0,.4));border:2px solid var(--green);border-radius:16px;
+  padding:24px 18px;text-align:center;box-shadow:0 20px 40px rgba(0,0,0,.5),0 0 50px rgba(142,240,181,.1);}
+.result-label{font-family:"JetBrains Mono",monospace;font-size:11px;letter-spacing:.3em;color:var(--green);text-transform:uppercase;margin-bottom:8px;}
+.result-amount{font-family:"JetBrains Mono",monospace;font-weight:800;font-size:48px;color:var(--green);line-height:1;}
+.result-total{margin-top:14px;padding-top:14px;border-top:1px solid rgba(142,240,181,.2);font-family:"JetBrains Mono",monospace;font-size:13px;color:var(--ink-dim);letter-spacing:.1em;}
+.result-total b{color:var(--goldb);font-size:18px;}
+@media (max-width:600px){.brand{font-size:28px;}}
+</style></head>
+<body>
+<div class="container">
+  <header>
+    <a href="/" class="back-btn" data-i18n="common.back">← Retour</a>
+    <div class="brand">
+      <span data-i18n="bank.title">La Banque</span>
+      <small data-i18n="bank.subtitle">Calculatrice de gains</small>
+    </div>
+  </header>
+
+  <div class="panel">
+    <label class="label" data-i18n="bank.your_bet">Votre mise</label>
+    <input type="number" class="input" id="bet-input" min="0" value="50" inputmode="numeric">
+  </div>
+
+  <div class="panel">
+    <label class="label" data-i18n="bank.bet_type">Type de pari</label>
+    <select id="type-select" class="input">
+      <option value="2"  data-i18n="bet.red">Rouge / Noir</option>
+      <option value="2"  data-i18n="bet.even">Pair / Impair</option>
+      <option value="2"  data-i18n="bet.low">1-18 / 19-36</option>
+      <option value="3"  data-i18n="bet.dozen1">Douzaine (2:1)</option>
+      <option value="3"  data-i18n="bet.col1">Colonne (2:1)</option>
+      <option value="36" data-i18n="phone.straight">Numéro plein (35:1)</option>
+    </select>
+  </div>
+
+  <div class="result-box">
+    <div class="result-label" data-i18n="bank.you_win">Vous gagnez</div>
+    <div class="result-amount" id="winnings">100</div>
+    <div class="result-total"><span data-i18n="bank.total_back">Total récupéré</span> : <b id="total">150</b></div>
+  </div>
+</div>
+
+<script src="/i18n.js"></script>
+<script src="/lang-switcher.js"></script>
+<script>
+I18N.init();
+const $ = s => document.querySelector(s);
+function update() {
+  const bet = Math.max(0, parseInt($('#bet-input').value) || 0);
+  const mult = parseInt($('#type-select').value) || 2;
+  const winnings = bet * (mult - 1);
+  const total = bet * mult;
+  $('#winnings').textContent = winnings.toLocaleString();
+  $('#total').textContent = total.toLocaleString();
+}
+$('#bet-input').addEventListener('input', update);
+$('#type-select').addEventListener('change', update);
+update();
+</script>
+</body>
+</html>

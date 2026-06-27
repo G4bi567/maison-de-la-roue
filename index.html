@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title data-i18n-doctitle="brand.title">Maison de la Roue · Accueil</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,700;0,6..96,900;1,6..96,700;1,6..96,900&family=JetBrains+Mono:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#06060a;--bg-2:#0e0a14;--ink:#f5ead0;--ink-dim:#a99e86;
+  --gold:#d4af37;--gold-bright:#f0cc5a;--line:rgba(212,175,55,.25);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html,body{background:var(--bg);color:var(--ink);font-family:"Bodoni Moda",serif;min-height:100vh;}
+body{
+  background:
+    radial-gradient(1200px 600px at 50% -10%, rgba(212,175,55,.15), transparent 70%),
+    radial-gradient(800px 500px at 50% 110%, rgba(182,18,42,.18), transparent 70%),
+    var(--bg);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:30px 20px;min-height:100vh;
+}
+header{text-align:center;margin-bottom:50px;animation:fadeDown 1s cubic-bezier(.2,.9,.3,1.1) forwards;}
+@keyframes fadeDown{from{opacity:0;transform:translateY(-30px);}to{opacity:1;transform:translateY(0);}}
+.brand{font-weight:900;font-style:italic;font-size:54px;line-height:1;letter-spacing:.02em;
+  background:linear-gradient(180deg,var(--gold-bright),var(--gold) 60%,#8a6e1c);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  text-shadow:0 0 60px rgba(212,175,55,.3);}
+.brand small{display:block;font-family:"JetBrains Mono",monospace;font-style:normal;font-weight:600;font-size:12px;
+  letter-spacing:.5em;color:var(--ink-dim);margin-top:14px;}
+.divider{width:80px;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);margin:25px auto 0;}
+.menu-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px;width:100%;max-width:900px;margin-bottom:30px;}
+.menu-card{
+  background:linear-gradient(180deg,rgba(255,255,255,.03),rgba(0,0,0,.3)),var(--bg-2);
+  border:1px solid var(--line);border-radius:16px;padding:30px 24px;text-align:center;cursor:pointer;
+  transition:all .3s cubic-bezier(.2,.9,.3,1.1);text-decoration:none;color:var(--ink);display:block;position:relative;overflow:hidden;
+  box-shadow:0 20px 40px -20px rgba(0,0,0,.8),inset 0 1px 0 rgba(255,255,255,.04);
+  opacity:0;animation:fadeUp .6s cubic-bezier(.2,.9,.3,1.1) forwards;
+}
+.menu-card:nth-child(1){animation-delay:.15s}.menu-card:nth-child(2){animation-delay:.25s}
+.menu-card:nth-child(3){animation-delay:.35s}.menu-card:nth-child(4){animation-delay:.45s}
+.menu-card:nth-child(5){animation-delay:.55s}.menu-card:nth-child(6){animation-delay:.65s}
+.menu-card:nth-child(7){animation-delay:.75s}.menu-card:nth-child(8){animation-delay:.85s}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+.menu-card::before{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;
+  background:linear-gradient(90deg,transparent,rgba(240,204,90,.08),transparent);transition:left .6s;}
+.menu-card:hover::before{left:100%;}
+.menu-card:hover{transform:translateY(-4px);border-color:var(--gold);
+  box-shadow:0 30px 50px -20px rgba(0,0,0,.9),0 0 30px rgba(212,175,55,.15),inset 0 1px 0 rgba(255,255,255,.06);}
+.menu-icon{font-size:48px;margin-bottom:14px;display:block;filter:drop-shadow(0 4px 12px rgba(0,0,0,.5));}
+.menu-title{font-family:"Bodoni Moda",serif;font-style:italic;font-weight:900;font-size:24px;color:var(--gold-bright);margin-bottom:8px;}
+.menu-desc{font-family:"JetBrains Mono",monospace;font-size:11px;font-weight:600;letter-spacing:.15em;text-transform:uppercase;color:var(--ink-dim);line-height:1.5;}
+.menu-card.admin{border-color:rgba(182,18,42,.4);background:linear-gradient(180deg,rgba(182,18,42,.06),rgba(0,0,0,.4)),var(--bg-2);}
+.menu-card.admin .menu-title{color:#ff6170;}
+.menu-card.admin:hover{border-color:#ff6170;box-shadow:0 30px 50px -20px rgba(0,0,0,.9),0 0 30px rgba(255,97,112,.2),inset 0 1px 0 rgba(255,255,255,.06);}
+.lock-badge{position:absolute;top:14px;right:14px;background:rgba(0,0,0,.6);border:1px solid rgba(255,97,112,.4);color:#ff6170;
+  font-family:"JetBrains Mono",monospace;font-size:9px;font-weight:800;padding:4px 8px;border-radius:4px;letter-spacing:.1em;}
+footer{text-align:center;font-family:"JetBrains Mono",monospace;font-size:10px;color:var(--ink-dim);
+  letter-spacing:.2em;text-transform:uppercase;margin-top:20px;opacity:.6;}
+/* Modal */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.85);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;
+  z-index:2000;opacity:0;pointer-events:none;transition:opacity .3s;padding:20px;}
+.modal-overlay.show{opacity:1;pointer-events:auto;}
+.modal-content{background:linear-gradient(180deg,rgba(255,255,255,.03),rgba(0,0,0,.4)),var(--bg-2);
+  border:1px solid var(--gold);border-radius:16px;padding:40px 30px;text-align:center;
+  box-shadow:0 30px 60px rgba(0,0,0,.9),0 0 40px rgba(212,175,55,.15);width:100%;max-width:380px;
+  transform:scale(.9);transition:transform .3s cubic-bezier(.2,.9,.3,1.3);}
+.modal-overlay.show .modal-content{transform:scale(1);}
+.modal-icon{font-size:48px;margin-bottom:14px;}
+.modal-title{font-family:"Bodoni Moda",serif;font-style:italic;font-weight:900;font-size:26px;color:var(--gold-bright);margin-bottom:8px;}
+.modal-subtitle{font-family:"JetBrains Mono",monospace;font-size:11px;letter-spacing:.2em;color:var(--ink-dim);text-transform:uppercase;margin-bottom:25px;}
+.password-input{width:100%;font-family:"JetBrains Mono",monospace;font-size:24px;font-weight:800;letter-spacing:.4em;text-align:center;
+  background:rgba(0,0,0,.5);border:1px solid var(--line);border-radius:10px;color:var(--gold-bright);padding:16px;outline:none;margin-bottom:14px;transition:all .2s;}
+.password-input:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(212,175,55,.15);}
+.password-input.error{border-color:#ff6170;animation:shake .4s;}
+@keyframes shake{0%,100%{transform:translateX(0);}25%{transform:translateX(-8px);}75%{transform:translateX(8px);}}
+.error-msg{font-family:"JetBrains Mono",monospace;font-size:11px;color:#ff6170;letter-spacing:.1em;text-transform:uppercase;height:14px;margin-bottom:14px;}
+.modal-actions{display:flex;gap:10px;}
+.modal-btn{flex:1;font-family:"JetBrains Mono",monospace;font-weight:800;font-size:12px;letter-spacing:.1em;text-transform:uppercase;padding:14px;border-radius:8px;
+  border:1px solid var(--line);background:transparent;color:var(--ink);cursor:pointer;transition:all .2s;}
+.modal-btn.primary{background:linear-gradient(180deg,var(--gold-bright),var(--gold));color:#201703;border-color:transparent;}
+.modal-btn:active{transform:scale(.97);}
+.modal-btn:hover{filter:brightness(1.1);}
+@media (max-width:600px){
+  .brand{font-size:38px;}.brand small{font-size:10px;letter-spacing:.4em;}
+  .menu-grid{grid-template-columns:1fr;}.menu-card{padding:24px 20px;}
+  .menu-icon{font-size:40px;}.menu-title{font-size:20px;}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <span data-i18n="brand.title">Maison de la Roue</span>
+    <small data-i18n="brand.subtitle">Soirée Casino · Bienvenue</small>
+  </div>
+  <div class="divider"></div>
+</header>
+
+<div class="menu-grid">
+
+  <a href="/phone" class="menu-card">
+    <span class="menu-icon">🎰</span>
+    <div class="menu-title" data-i18n="menu.join.title">Rejoindre la Table</div>
+    <div class="menu-desc" data-i18n="menu.join.desc">Joueur · Roulette mobile</div>
+  </a>
+
+  <a href="/display" class="menu-card">
+    <span class="menu-icon">🎯</span>
+    <div class="menu-title" data-i18n="menu.display.title">Écran Principal</div>
+    <div class="menu-desc" data-i18n="menu.display.desc">Affichage TV · Table de jeu</div>
+  </a>
+
+  <a href="/rules" class="menu-card">
+    <span class="menu-icon">📖</span>
+    <div class="menu-title" data-i18n="menu.rules.title">Règles des Jeux</div>
+    <div class="menu-desc" data-i18n="menu.rules.desc">Blackjack · Poker · Roulette</div>
+  </a>
+
+  <a href="/coffre" class="menu-card">
+    <span class="menu-icon">🏦</span>
+    <div class="menu-title" data-i18n="menu.coffre.title">Mon Coffre</div>
+    <div class="menu-desc" data-i18n="menu.coffre.desc">Suivi personnel · Sauvegardé</div>
+  </a>
+
+  <a href="/leaderboard" class="menu-card">
+    <span class="menu-icon">🏆</span>
+    <div class="menu-title" data-i18n="menu.leader.title">Classement</div>
+    <div class="menu-desc" data-i18n="menu.leader.desc">Podium des joueurs · Live TV</div>
+  </a>
+
+  <a href="/liarbar" class="menu-card" style="border-color:rgba(176,109,255,.35);background:linear-gradient(180deg,rgba(176,109,255,.05),rgba(0,0,0,.35)),var(--bg-2);">
+    <span class="menu-icon">🃏</span>
+    <div class="menu-title" style="color:#b06dff;" data-i18n="menu.liar.title">Liar's Bar</div>
+    <div class="menu-desc" data-i18n="menu.liar.desc">Bluff &amp; cartes · Grand écran</div>
+  </a>
+
+  <a href="/games" class="menu-card" style="border-color:rgba(72,209,148,.35);background:linear-gradient(180deg,rgba(72,209,148,.05),rgba(0,0,0,.35)),var(--bg-2);">
+    <span class="menu-icon">🎲</span>
+    <div class="menu-title" style="color:#48d194;" data-i18n="menu.games.title">Salle des Jeux</div>
+    <div class="menu-desc" data-i18n="menu.games.desc">Slot · Lucky · Bataille · TV</div>
+  </a>
+
+  <a href="/banque" class="menu-card">
+    <span class="menu-icon">💰</span>
+    <div class="menu-title" data-i18n="menu.bank.title">La Banque</div>
+    <div class="menu-desc" data-i18n="menu.bank.desc">Calculatrice de gains</div>
+  </a>
+
+  <a href="#" class="menu-card admin" id="admin-link">
+    <div class="lock-badge" data-i18n="menu.admin.badge">🔒 PROTÉGÉ</div>
+    <span class="menu-icon">🎩</span>
+    <div class="menu-title" data-i18n="menu.admin.title">Maître du Jeu</div>
+    <div class="menu-desc" data-i18n="menu.admin.desc">Panneau Admin · Mot de passe requis</div>
+  </a>
+
+</div>
+
+<footer data-i18n="foot.tagline">◆ Maison de la Roue · Table № 1 ◆</footer>
+
+<div class="modal-overlay" id="pwd-modal">
+  <div class="modal-content">
+    <div class="modal-icon">🔐</div>
+    <div class="modal-title" data-i18n="menu.pwd.title">Accès Restreint</div>
+    <div class="modal-subtitle" data-i18n="menu.pwd.subtitle">Mot de passe requis</div>
+    <input type="password" class="password-input" id="pwd-input" placeholder="••••" maxlength="20" autocomplete="off" inputmode="numeric">
+    <div class="error-msg" id="pwd-error"></div>
+    <div class="modal-actions">
+      <button class="modal-btn" onclick="closePwdModal()" data-i18n="common.cancel">Annuler</button>
+      <button class="modal-btn primary" onclick="checkPassword()" data-i18n="menu.pwd.enter">Entrer</button>
+    </div>
+  </div>
+</div>
+
+<script src="/i18n.js"></script>
+<script src="/lang-switcher.js"></script>
+<script>
+const ADMIN_PASSWORD = "casino2026";
+I18N.init();
+
+const modal    = document.getElementById('pwd-modal');
+const input    = document.getElementById('pwd-input');
+const errorMsg = document.getElementById('pwd-error');
+const adminLink= document.getElementById('admin-link');
+
+adminLink.addEventListener('click', e => {
+  e.preventDefault();
+  if (sessionStorage.getItem('admin_auth') === 'ok') { window.location.href='/admin'; return; }
+  openPwdModal();
+});
+
+function openPwdModal() {
+  modal.classList.add('show');
+  errorMsg.textContent=''; input.classList.remove('error'); input.value='';
+  setTimeout(()=>input.focus(),300);
+}
+function closePwdModal() {
+  modal.classList.remove('show'); input.value=''; errorMsg.textContent=''; input.classList.remove('error');
+}
+function checkPassword() {
+  const pwd = input.value.trim();
+  if (pwd === ADMIN_PASSWORD) {
+    sessionStorage.setItem('admin_auth','ok');
+    errorMsg.style.color='#8ef0b5';
+    errorMsg.textContent = t('menu.pwd.ok');
+    setTimeout(()=>{ window.location.href='/admin'; }, 500);
+  } else {
+    input.classList.add('error');
+    errorMsg.style.color='#ff6170';
+    errorMsg.textContent = t('menu.pwd.bad');
+    input.value='';
+    if (navigator.vibrate) navigator.vibrate([50,50,50]);
+    setTimeout(()=>{ input.classList.remove('error'); input.focus(); }, 400);
+  }
+}
+input.addEventListener('keydown',e=>{ if(e.key==='Enter')checkPassword(); if(e.key==='Escape')closePwdModal(); });
+modal.addEventListener('click',e=>{ if(e.target===modal)closePwdModal(); });
+</script>
+</body>
+</html>

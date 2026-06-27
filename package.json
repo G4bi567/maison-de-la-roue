@@ -1,0 +1,12 @@
+{
+  "name": "maison-de-la-roue",
+  "version": "1.0.0",
+  "description": "Casino party app — multilingual roulette + Liar's Bar",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

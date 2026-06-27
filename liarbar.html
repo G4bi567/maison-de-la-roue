@@ -1,0 +1,385 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title data-i18n-doctitle="menu.liar.title">Liar's Bar · Maison de la Roue</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,wght@0,700;0,900;1,700;1,900&family=JetBrains+Mono:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#06060a;--bg2:#0e0a14;--ink:#f5ead0;--ink-dim:#a99e86;--gold:#d4af37;--goldb:#f0cc5a;--red:#b6122a;--redb:#d8213c;--purple:#6b2fa0;--purpleb:#9d4fd4;--line:rgba(212,175,55,.25);}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;background:var(--bg);color:var(--ink);font-family:"Bodoni Moda",serif;overflow:hidden;}
+body{background:radial-gradient(1400px 700px at 50% -20%,rgba(107,47,160,.2),transparent 70%),radial-gradient(900px 600px at 0% 100%,rgba(182,18,42,.18),transparent 70%),var(--bg);}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;background-image:radial-gradient(rgba(255,255,255,.025) 1px,transparent 1px);background-size:4px 4px;mix-blend-mode:overlay;opacity:.5;}
+.top{position:absolute;top:0;left:0;right:0;padding:20px 40px;display:flex;justify-content:space-between;align-items:center;z-index:5;padding-right:160px;}
+.brand{font-weight:900;font-style:italic;font-size:30px;background:linear-gradient(180deg,var(--goldb),var(--gold) 60%,#8a6e1c);-webkit-background-clip:text;background-clip:text;color:transparent;}
+.brand small{display:block;font-family:"JetBrains Mono",monospace;font-style:normal;font-weight:600;font-size:10px;letter-spacing:.4em;color:var(--ink-dim);margin-top:3px;}
+.badge{font-family:"JetBrains Mono",monospace;font-weight:800;font-size:11px;letter-spacing:.4em;text-transform:uppercase;
+  padding:9px 16px;border-radius:4px;border:1px solid var(--line);color:var(--gold);background:rgba(0,0,0,.35);backdrop-filter:blur(8px);}
+.badge.playing{color:var(--purpleb);border-color:rgba(157,79,212,.5);animation:glow 1.4s ease-in-out infinite alternate;}
+.badge.reveal{color:#f8c5a5;border-color:rgba(248,197,165,.5);}
+.badge.shooting{color:#ff6170;border-color:rgba(255,97,112,.7);animation:glowR 0.6s ease-in-out infinite alternate;}
+@keyframes glow{to{box-shadow:0 0 30px rgba(157,79,212,.5);}}
+@keyframes glowR{to{box-shadow:0 0 30px rgba(255,97,112,.7);}}
+.stage{position:absolute;inset:0;padding-top:76px;display:grid;grid-template-columns:1fr 360px;grid-template-rows:1fr;}
+.center{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px 30px;gap:22px;}
+.side{padding:16px 28px 28px 0;display:flex;flex-direction:column;gap:14px;overflow:hidden;}
+.rank-box{background:linear-gradient(180deg,rgba(107,47,160,.1),rgba(0,0,0,.4));border:1px solid rgba(157,79,212,.4);border-radius:20px;
+  padding:32px 60px;text-align:center;box-shadow:0 0 60px rgba(157,79,212,.15);}
+.rank-tag{font-family:"JetBrains Mono",monospace;font-weight:800;font-size:11px;letter-spacing:.45em;color:var(--purpleb);text-transform:uppercase;margin-bottom:8px;}
+.rank-name{font-family:"Bodoni Moda",serif;font-weight:900;font-style:italic;font-size:80px;line-height:1;letter-spacing:.02em;
+  background:linear-gradient(180deg,var(--purpleb),var(--purple));-webkit-background-clip:text;background-clip:text;color:transparent;text-shadow:0 0 50px rgba(157,79,212,.4);}
+.turn-box{background:rgba(0,0,0,.4);border:1px solid var(--line);border-radius:14px;padding:18px 30px;text-align:center;box-shadow:inset 0 0 30px rgba(0,0,0,.3);min-width:380px;}
+.turn-whose{font-family:"JetBrains Mono",monospace;font-size:11px;letter-spacing:.4em;color:var(--ink-dim);text-transform:uppercase;margin-bottom:8px;}
+.turn-name{font-family:"Bodoni Moda",serif;font-weight:900;font-style:italic;font-size:42px;color:var(--ink);}
+.turn-name .dot{display:inline-block;width:14px;height:14px;border-radius:50%;margin-right:10px;vertical-align:middle;box-shadow:0 0 14px currentColor;}
+/* ─── Revolver overlay ─── */
+.revolver-overlay{position:absolute;inset:0;background:radial-gradient(circle at center,rgba(60,5,5,.92),rgba(6,6,10,.98));
+  z-index:20;display:none;flex-direction:column;align-items:center;justify-content:center;animation:fadeIn .5s;}
+.revolver-overlay.show{display:flex;}
+@keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
+.shooter-banner{font-family:"JetBrains Mono",monospace;font-weight:800;font-size:14px;letter-spacing:.5em;color:#ff6170;text-transform:uppercase;margin-bottom:14px;animation:pulseR 1s infinite;}
+@keyframes pulseR{50%{opacity:.5;}}
+.shooter-name{font-family:"Bodoni Moda",serif;font-weight:900;font-style:italic;font-size:72px;color:#fff;margin-bottom:30px;text-shadow:0 0 30px rgba(255,97,112,.6);}
+.cylinder-wrap{position:relative;width:260px;height:260px;margin-bottom:30px;}
+.cylinder{position:relative;width:100%;height:100%;border-radius:50%;
+  background:radial-gradient(circle at 30% 30%,#4a4a52,#1a1620 70%,#0b080d);
+  border:6px solid #2a2530;box-shadow:0 0 60px rgba(0,0,0,.9),inset 0 -20px 40px rgba(0,0,0,.5),inset 0 10px 30px rgba(255,255,255,.05);
+  transition:transform 2s cubic-bezier(.17,.67,.18,1.02);}
+.cylinder.spinning{transform:rotate(2160deg);}
+.cylinder.dramatic-spin{transition:transform 2.6s cubic-bezier(.2,.7,.15,1);transform:rotate(3240deg);}
+.chamber{position:absolute;width:54px;height:54px;border-radius:50%;
+  background:radial-gradient(circle at 30% 30%,#0d0a14,#06060a);border:2px solid #4a4a52;box-shadow:inset 0 3px 6px rgba(0,0,0,.8);}
+.chamber.bullet{background:radial-gradient(circle at 30% 30%,#f0cc5a,#8a6e1c);border-color:#d4af37;box-shadow:inset 0 3px 6px rgba(138,110,28,.6),0 0 10px rgba(240,204,90,.4);}
+.chamber.revealed-bullet{background:radial-gradient(circle at 30% 30%,#ff6170,#a20f24);border-color:#ff6170;box-shadow:0 0 30px rgba(255,97,112,1),inset 0 0 15px rgba(255,255,255,.4);animation:bulletPulse .6s infinite, bulletZoom .8s ease-out;}
+.chamber.empty-revealed{background:radial-gradient(circle at 30% 30%,#3a4a3a,#0a1408);border-color:#5ec98a;box-shadow:0 0 15px rgba(94,201,138,.5);}
+@keyframes bulletPulse{50%{box-shadow:0 0 30px rgba(255,97,112,1),inset 0 0 20px rgba(255,255,255,.6);}}
+@keyframes bulletZoom{0%{transform:scale(1);}50%{transform:scale(2.5);}100%{transform:scale(1.4);}}
+.barrel-overlay{position:absolute;width:100%;height:100%;top:0;left:0;border-radius:50%;pointer-events:none;
+  background:radial-gradient(circle at center,transparent 25%,rgba(0,0,0,.6) 60%);}
+/* Round badge */
+.round-badge{position:absolute;top:18px;left:50%;transform:translateX(-50%);font-family:"JetBrains Mono",monospace;font-size:11px;letter-spacing:.5em;color:var(--gold);background:rgba(0,0,0,.7);padding:6px 18px;border-radius:4px;border:1px solid var(--line);text-transform:uppercase;z-index:25;}
+/* Last-bullet warning */
+.danger-warning{font-family:"JetBrains Mono",monospace;font-size:14px;letter-spacing:.3em;color:#ff6170;text-transform:uppercase;margin-top:6px;animation:dangerBlink .8s infinite;}
+@keyframes dangerBlink{50%{opacity:.3;}}
+/* Player elimination skull animation */
+.player-row.eliminated{position:relative;}
+.player-row.eliminated::after{content:"💀";position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:18px;opacity:.8;}
+.player-row.winner-glow{border-color:var(--goldb)!important;background:linear-gradient(180deg,rgba(212,175,55,.15),rgba(0,0,0,.4))!important;box-shadow:0 0 30px rgba(212,175,55,.3);}
+.player-row.winner-glow::after{content:"👑";position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:20px;animation:crownBob 1.5s ease-in-out infinite;}
+@keyframes crownBob{50%{transform:translateY(-65%) rotate(8deg);}}
+.risk-info{font-family:"JetBrains Mono",monospace;font-size:13px;letter-spacing:.3em;color:var(--ink-dim);text-transform:uppercase;margin-bottom:24px;}
+.risk-info b{color:#ff6170;font-size:18px;}
+.verdict{font-family:"Bodoni Moda",serif;font-weight:900;font-style:italic;font-size:80px;text-shadow:0 0 40px currentColor;opacity:0;transition:opacity .3s;}
+.verdict.show{opacity:1;animation:verdictPop .5s;}
+@keyframes verdictPop{from{transform:scale(.5);}to{transform:scale(1);}}
+.verdict.alive{color:#8ef0b5;}
+.verdict.dead{color:#ff6170;}
+/* shake on bang */
+.revolver-overlay.bang{animation:shakeBang .4s;}
+@keyframes shakeBang{0%,100%{transform:translateX(0);}20%{transform:translateX(-10px);}40%{transform:translateX(10px);}60%{transform:translateX(-8px);}80%{transform:translateX(8px);}}
+/* white flash on bang */
+.flash-white{position:fixed;inset:0;background:#fff;z-index:30;opacity:0;pointer-events:none;}
+.flash-white.fire{animation:flashFire .2s;}
+@keyframes flashFire{0%{opacity:.95;}100%{opacity:0;}}
+/* Panels & player list */
+.panel{background:linear-gradient(180deg,rgba(255,255,255,.02),rgba(0,0,0,.3)),var(--bg2);border:1px solid var(--line);border-radius:12px;padding:16px 18px;box-shadow:0 20px 40px -20px rgba(0,0,0,.8),inset 0 1px 0 rgba(255,255,255,.04);}
+h3.section{font-family:"JetBrains Mono",monospace;font-size:10px;font-weight:800;letter-spacing:.4em;text-transform:uppercase;color:var(--gold);margin-bottom:10px;}
+.players-list{display:flex;flex-direction:column;gap:8px;max-height:340px;overflow:auto;}
+.player-row{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.04);position:relative;overflow:hidden;}
+.player-row.active-turn{border-color:rgba(157,79,212,.6);background:rgba(157,79,212,.1);animation:pulseB 1.6s infinite;}
+@keyframes pulseB{50%{border-color:rgba(157,79,212,.9);box-shadow:0 0 20px rgba(157,79,212,.25);}}
+.player-row.eliminated{opacity:.35;filter:grayscale(.7);}
+.p-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;box-shadow:0 0 10px currentColor;}
+.p-name{flex:1;font-family:"Bodoni Moda",serif;font-style:italic;font-weight:700;font-size:17px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.p-state{font-family:"JetBrains Mono",monospace;font-size:9px;color:var(--ink-dim);letter-spacing:.1em;margin-top:2px;text-transform:uppercase;}
+.log-list{display:flex;flex-direction:column;gap:6px;max-height:300px;overflow:auto;}
+.log-entry{font-family:"JetBrains Mono",monospace;font-size:10px;letter-spacing:.05em;color:var(--ink-dim);padding:5px 8px;border-radius:6px;background:rgba(0,0,0,.2);line-height:1.5;}
+.log-entry.new{color:var(--ink);}
+/* Lobby + Ended overlays */
+.lobby-overlay,.ended-overlay{position:absolute;inset:0;background:rgba(6,6,10,.94);backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:center;z-index:15;flex-direction:column;gap:24px;padding:30px;}
+.lobby-overlay h2,.ended-overlay h2{font-family:"Bodoni Moda",serif;font-style:italic;font-weight:900;font-size:54px;background:linear-gradient(180deg,var(--purpleb),var(--purple));-webkit-background-clip:text;background-clip:text;color:transparent;}
+.lobby-overlay p{font-style:italic;color:var(--ink-dim);font-size:16px;text-align:center;max-width:550px;line-height:1.5;}
+.lobby-players{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;max-width:600px;}
+.lobby-pip{padding:8px 16px;border-radius:20px;border:1px solid;font-family:"JetBrains Mono",monospace;font-weight:800;font-size:13px;letter-spacing:.1em;}
+.winner-name{font-family:"Bodoni Moda",serif;font-style:italic;font-weight:900;font-size:60px;color:var(--goldb);text-shadow:0 0 40px rgba(240,204,90,.4);}
+.winner-trophy{font-size:80px;}
+</style></head>
+<body>
+
+<div class="top">
+  <div class="brand">
+    <span data-i18n="menu.liar.title">Liar's Bar</span>
+    <small data-i18n="brand.table">Table № 1</small>
+  </div>
+  <div class="badge" id="phase-badge" data-i18n="brand.subtitle">LOBBY</div>
+</div>
+
+<div class="stage">
+  <div class="center">
+    <div class="rank-box">
+      <div class="rank-tag" data-i18n="liar.current_rank">Carte à annoncer</div>
+      <div class="rank-name" id="current-rank">—</div>
+    </div>
+    <div class="turn-box" id="turn-box" style="display:none">
+      <div class="turn-whose" data-i18n="liar.turn">À jouer</div>
+      <div class="turn-name" id="turn-name">—</div>
+    </div>
+  </div>
+
+  <aside class="side">
+    <div class="panel" style="text-align:center;padding:14px">
+      <div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.35em;color:var(--ink-dim);text-transform:uppercase;margin-bottom:8px" data-i18n="disp.join">◆ Join from your phone</div>
+      <canvas id="qr" style="display:block;margin:0 auto;background:#fff;border-radius:6px;max-width:140px;width:100%;height:auto"></canvas>
+      <div id="qr-url" style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--ink);margin-top:8px;word-break:break-all"></div>
+    </div>
+    <div class="panel" style="flex:1;min-height:0;display:flex;flex-direction:column">
+      <h3 class="section" data-i18n="disp.players_at">◆ Players at the table</h3>
+      <div class="players-list" id="players-list">
+        <div style="color:var(--ink-dim);font-style:italic;text-align:center;padding:16px 0" data-i18n="liar.lobby.nobody">Waiting for players…</div>
+      </div>
+    </div>
+    <div class="panel">
+      <h3 class="section">◆ Journal</h3>
+      <div class="log-list" id="log-list">
+        <div class="log-entry">—</div>
+      </div>
+    </div>
+  </aside>
+</div>
+
+<!-- Revolver overlay -->
+<div class="revolver-overlay" id="revolver-overlay">
+  <div class="round-badge" id="overlay-round" data-i18n="liar.round">Tour 1</div>
+  <div class="shooter-banner" data-i18n="liar.must_pull">doit tirer</div>
+  <div class="shooter-name" id="shooter-name">—</div>
+  <div class="cylinder-wrap">
+    <div class="cylinder" id="cylinder"></div>
+    <div class="barrel-overlay"></div>
+  </div>
+  <div class="risk-info">
+    <span data-i18n="liar.chambers">Chambres</span>: <b id="chamber-count">6</b> · <span data-i18n="liar.bullet_risk">Risque</span>: <b id="bullet-risk">1/6</b>
+  </div>
+  <div class="danger-warning" id="danger-warn" style="display:none" data-i18n="liar.last_bullet">⚠ DERNIÈRE BALLE ⚠</div>
+  <div class="verdict" id="verdict">—</div>
+</div>
+<div class="flash-white" id="flash"></div>
+
+<!-- Lobby -->
+<div class="lobby-overlay" id="lobby-overlay">
+  <h2 data-i18n="liar.lobby.title">Liar's Bar</h2>
+  <p data-i18n="liar.lobby.sub">Bluff. Nervos. Y un revólver cargado.</p>
+  <div class="lobby-players" id="lobby-players">
+    <span style="color:var(--ink-dim);font-style:italic" data-i18n="liar.lobby.nobody">Nobody here yet</span>
+  </div>
+</div>
+
+<!-- Ended -->
+<div class="ended-overlay" id="ended-overlay" style="display:none">
+  <div class="winner-trophy">🏆</div>
+  <h2 data-i18n="liar.winner">VAINQUEUR</h2>
+  <div class="winner-name" id="winner-name">—</div>
+  <p data-i18n="liar.game_over">Partie terminée</p>
+</div>
+
+<script src="/qr.js"></script>
+<script src="/i18n.js"></script>
+<script src="/lang-switcher.js"></script>
+<script>
+I18N.init();
+
+let ws, state = null;
+
+function connect() {
+  const proto = location.protocol==='https:'?'wss':'ws';
+  ws = new WebSocket(proto+'://'+location.host);
+  ws.onopen = () => {
+    ws.send(JSON.stringify({type:'liar-display-hello'}));
+    const joinUrl = location.origin + '/phone';
+    const urlEl = document.getElementById('qr-url'); if (urlEl) urlEl.textContent = joinUrl.replace(/^https?:\/\//,'');
+    try { QR.draw(document.getElementById('qr'), joinUrl, {scale:5, margin:2}); } catch(e){}
+  };
+  ws.onclose = () => setTimeout(connect, 1200);
+  ws.onmessage = e => {
+    const msg = JSON.parse(e.data);
+    if (msg.type === 'liar-state') applyState(msg);
+    if (msg.type === 'liar-trigger-result') showTriggerResult(msg);
+  };
+}
+
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+
+function placeChambers(total, bulletIdx) {
+  const cyl = document.getElementById('cylinder');
+  cyl.innerHTML = '';
+  const radius = 95;
+  for (let i = 0; i < total; i++) {
+    const angle = (Math.PI*2 * i / total) - Math.PI/2;
+    const x = Math.cos(angle) * radius + 130 - 27;
+    const y = Math.sin(angle) * radius + 130 - 27;
+    const ch = document.createElement('div');
+    ch.className = 'chamber';
+    if (i === bulletIdx) ch.classList.add('bullet');
+    ch.style.left = x + 'px';
+    ch.style.top = y + 'px';
+    cyl.appendChild(ch);
+  }
+}
+
+function applyState(s) {
+  state = s;
+  const phase = s.phase;
+  const badge = document.getElementById('phase-badge');
+  badge.className = 'badge ' + (phase==='shooting' ? 'shooting' : phase==='playing' ? 'playing' : phase==='reveal' ? 'reveal' : '');
+  const phaseTexts = { lobby:t('liar.lobby.title'), playing:'IN PLAY', reveal:t('liar.bluff').replace('⚡',''), shooting:t('liar.revolver'), ended:t('liar.game_over') };
+  badge.textContent = phaseTexts[phase] || phase.toUpperCase();
+
+  document.getElementById('lobby-overlay').style.display = phase==='lobby' ? 'flex' : 'none';
+  document.getElementById('ended-overlay').style.display = phase==='ended' ? 'flex' : 'none';
+
+  // Lobby pips
+  const lp = document.getElementById('lobby-players');
+  const pids = Object.keys(s.players);
+  if (pids.length === 0) {
+    lp.innerHTML = '<span style="color:var(--ink-dim);font-style:italic">' + t('liar.lobby.nobody') + '</span>';
+  } else {
+    lp.innerHTML = pids.map(id => {
+      const p = s.players[id];
+      return `<div class="lobby-pip" style="border-color:${p.color}80;color:${p.color}"><span style="margin-right:4px">${p.avatar||'🎩'}</span>${esc(p.name)}</div>`;
+    }).join('');
+  }
+
+  document.getElementById('current-rank').textContent = s.currentRank || '—';
+
+  // Turn
+  const turnBox = document.getElementById('turn-box');
+  if (phase === 'playing' || phase === 'reveal') {
+    turnBox.style.display = 'block';
+    const aliveOrder = (s.order||[]).filter(id => s.players[id] && !s.players[id].eliminated);
+    if (aliveOrder.length) {
+      const currentId = aliveOrder[s.turnIdx % aliveOrder.length];
+      const cp = s.players[currentId];
+      if (cp) document.getElementById('turn-name').innerHTML = `<span class="dot" style="background:${cp.color};color:${cp.color}"></span><span style="margin-right:6px">${cp.avatar||'🎩'}</span>${esc(cp.name)}`;
+    }
+  } else turnBox.style.display = 'none';
+
+  // Shooting phase: show revolver overlay
+  const ro = document.getElementById('revolver-overlay');
+  const wasShooting = window._lastShooter === s.shooter && window._lastPhase === 'shooting';
+  if (phase === 'shooting' && s.shooter) {
+    ro.classList.add('show');
+    const sh = s.players[s.shooter];
+    if (sh) document.getElementById('shooter-name').textContent = (sh.avatar||'') + ' ' + sh.name;
+    document.getElementById('chamber-count').textContent = s.chambers;
+    document.getElementById('bullet-risk').textContent = '1/' + s.chambers;
+    document.getElementById('overlay-round').textContent = t('liar.round') + ' ' + (s.round || 1);
+    const warn = document.getElementById('danger-warn');
+    warn.style.display = (s.chambers <= 2) ? 'block' : 'none';
+    placeChambers(s.chambers, -1);  // hide bullet position
+    document.getElementById('verdict').classList.remove('show','alive','dead');
+    document.getElementById('verdict').textContent = '—';
+    const cyl = document.getElementById('cylinder');
+    cyl.classList.remove('spinning','dramatic-spin');
+    void cyl.offsetWidth;
+    cyl.classList.add('dramatic-spin');
+    if (!wasShooting) {
+      // First time we enter this shooting state — play cinematic spin sound + hammer cock
+      SFX.cylinderSpin();
+      setTimeout(() => SFX.hammerCock(), 1800);
+    }
+  } else if (phase !== 'shooting' && phase !== 'reveal') {
+    ro.classList.remove('show');
+  }
+  window._lastShooter = s.shooter;
+  window._lastPhase = phase;
+
+  // Players list
+  const list = document.getElementById('players-list');
+  const ids = pids;
+  if (ids.length === 0) {
+    list.innerHTML = '<div style="color:var(--ink-dim);font-style:italic;text-align:center;padding:16px 0">' + t('liar.lobby.nobody') + '</div>';
+  } else {
+    const aliveOrder = (s.order||[]).filter(id => s.players[id] && !s.players[id].eliminated);
+    const currentId = aliveOrder.length ? aliveOrder[s.turnIdx % aliveOrder.length] : null;
+    const isWinnerPhase = phase === 'ended' && aliveOrder.length === 1;
+    list.innerHTML = ids.map(id => {
+      const p = s.players[id]; if (!p) return '';
+      const isTurn = id === currentId && (phase==='playing'||phase==='reveal');
+      const elim = p.eliminated;
+      const isWin = isWinnerPhase && !elim;
+      const stateLbl = isWin ? t('liar.winner') : elim ? t('liar.eliminated') : t('liar.alive');
+      return `<div class="player-row ${isTurn?'active-turn':''} ${elim?'eliminated':''} ${isWin?'winner-glow':''}">
+        <span class="p-dot" style="background:${p.color};color:${p.color}"></span>
+        <div style="flex:1;min-width:0">
+          <div class="p-name"><span style="margin-right:5px">${p.avatar||'🎩'}</span>${esc(p.name)}</div>
+          <div class="p-state">${stateLbl}</div>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  // Log
+  const logEl = document.getElementById('log-list');
+  const logs = s.log || [];
+  if (!logs.length) logEl.innerHTML = '<div class="log-entry">—</div>';
+  else logEl.innerHTML = logs.slice().reverse().map((l,i)=>`<div class="log-entry ${i<2?'new':''}">${esc(localizeLog(l))}</div>`).join('');
+
+  // Ended winner
+  if (phase === 'ended') {
+    const alive = Object.entries(s.players).filter(([,p])=>!p.eliminated);
+    if (alive.length === 1) document.getElementById('winner-name').textContent = (alive[0][1].avatar||'') + ' ' + alive[0][1].name;
+    else if (alive.length > 1) document.getElementById('winner-name').textContent = alive.map(([,p])=>p.name).join(' & ');
+    if (!window._fanfarePlayed) { SFX.survivorFanfare(); window._fanfarePlayed = true; }
+  } else {
+    window._fanfarePlayed = false;
+  }
+}
+
+function localizeLog(l) {
+  if (!l) return '';
+  if (typeof l === 'string') return l;
+  if (l.key) return t(l.key, l.vars || {});
+  return l.msg || '';
+}
+
+function showTriggerResult(msg) {
+  // Reveal bullet chamber + verdict
+  setTimeout(() => {
+    placeChambers(msg.chambers, msg.bulletIdx);
+    if (msg.result === 'bang') {
+      // BANG!
+      document.getElementById('flash').classList.add('fire');
+      setTimeout(()=>document.getElementById('flash').classList.remove('fire'), 200);
+      document.getElementById('revolver-overlay').classList.add('bang');
+      setTimeout(()=>document.getElementById('revolver-overlay').classList.remove('bang'), 400);
+      SFX.bangCinematic();
+      const v = document.getElementById('verdict');
+      v.className = 'verdict show dead';
+      v.textContent = t('liar.bang');
+      // mark the chamber as the firing one
+      const chambers = document.querySelectorAll('.chamber');
+      if (chambers[msg.bulletIdx]) chambers[msg.bulletIdx].classList.add('revealed-bullet');
+      // Sad death tone 1.2s later
+      setTimeout(() => SFX.deathTone(), 1200);
+    } else {
+      SFX.empty();
+      const v = document.getElementById('verdict');
+      v.className = 'verdict show alive';
+      v.textContent = t('liar.click');
+      // Mark bullet position as visible (so they see how close they were)
+      const chambers = document.querySelectorAll('.chamber');
+      if (chambers[msg.bulletIdx]) chambers[msg.bulletIdx].classList.add('bullet');
+      // Also mark some non-bullet as empty-revealed (the one that fired)
+      // Pick a random non-bullet chamber that "fired"
+      let fired = Math.floor(Math.random() * msg.chambers);
+      while (fired === msg.bulletIdx && msg.chambers > 1) fired = Math.floor(Math.random() * msg.chambers);
+      if (chambers[fired]) chambers[fired].classList.add('empty-revealed');
+    }
+  }, 2200); // wait for cylinder spin
+}
+
+document.addEventListener('langchange', () => { if (state) applyState(state); });
+connect();
+</script>
+</body>
+</html>

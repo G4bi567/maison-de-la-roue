@@ -1,0 +1,337 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title data-i18n-doctitle="coffre.title">Mon Coffre · Maison de la Roue</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,wght@0,700;0,900;1,700&family=JetBrains+Mono:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#06060a;--bg-2:#0e0a14;--ink:#f5ead0;--ink-dim:#a99e86;--gold:#d4af37;--gold-bright:#f0cc5a;--line:rgba(212,175,55,.25);--green:#8ef0b5;--red:#ff6170;}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html,body{background:var(--bg);color:var(--ink);font-family:"Bodoni Moda",serif;min-height:100vh;}
+body{background:radial-gradient(800px 400px at 50% -10%,rgba(212,175,55,.18),transparent 70%),var(--bg);padding:20px;padding-bottom:60px;}
+.container{max-width:600px;margin:0 auto;}
+header{text-align:center;margin-bottom:25px;position:relative;}
+.back-btn{position:absolute;left:0;top:8px;background:rgba(0,0,0,.4);border:1px solid var(--line);color:var(--ink-dim);
+  padding:8px 14px;border-radius:8px;text-decoration:none;font-family:"JetBrains Mono",monospace;font-size:11px;font-weight:800;letter-spacing:.1em;}
+.back-btn:hover{color:var(--gold-bright);border-color:var(--gold);}
+.brand{font-weight:900;font-style:italic;font-size:38px;
+  background:linear-gradient(180deg,var(--gold-bright),var(--gold) 60%,#8a6e1c);-webkit-background-clip:text;background-clip:text;color:transparent;}
+.brand small{display:block;font-family:"JetBrains Mono",monospace;font-style:normal;font-weight:600;font-size:11px;letter-spacing:.3em;color:var(--ink-dim);margin-top:8px;text-transform:uppercase;}
+.profile-box{background:linear-gradient(180deg,rgba(255,255,255,.02),rgba(0,0,0,.3)),var(--bg-2);
+  border:1px solid var(--line);border-radius:14px;padding:14px 18px;margin-bottom:20px;}
+.name-input{width:100%;background:rgba(0,0,0,.4);border:1px solid var(--line);color:var(--ink);padding:12px;
+  font-family:"Bodoni Moda",serif;font-style:italic;font-size:18px;text-align:center;border-radius:8px;outline:none;}
+.name-input:focus{border-color:var(--gold);}
+.total-box{background:linear-gradient(180deg,rgba(212,175,55,.1),rgba(0,0,0,.4));border:2px solid var(--gold);border-radius:20px;
+  padding:30px 20px;text-align:center;margin-bottom:20px;box-shadow:0 20px 40px rgba(0,0,0,.6),0 0 60px rgba(212,175,55,.15);}
+.total-label{font-family:"JetBrains Mono",monospace;font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:var(--gold);margin-bottom:10px;}
+.total-amount{font-family:"JetBrains Mono",monospace;font-weight:800;font-size:60px;color:var(--gold-bright);
+  text-shadow:0 0 30px rgba(240,204,90,.4);line-height:1;transition:all .3s;}
+.total-amount.flash{animation:flashGold .5s;}
+@keyframes flashGold{0%{transform:scale(1.08);color:#fff;}100%{transform:scale(1);color:var(--gold-bright);}}
+.total-count{font-family:"JetBrains Mono",monospace;font-size:10px;color:var(--ink-dim);letter-spacing:.2em;text-transform:uppercase;margin-top:8px;}
+.chips-section{background:linear-gradient(180deg,rgba(255,255,255,.02),rgba(0,0,0,.3)),var(--bg-2);
+  border:1px solid var(--line);border-radius:16px;padding:18px;margin-bottom:20px;}
+.section-title{font-family:"JetBrains Mono",monospace;font-size:10px;font-weight:800;letter-spacing:.3em;text-transform:uppercase;
+  color:var(--gold);margin-bottom:14px;text-align:center;}
+.chip-row{display:flex;align-items:center;gap:10px;background:rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.04);padding:10px 12px;border-radius:12px;margin-bottom:8px;}
+.chip{width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-family:"JetBrains Mono",monospace;font-weight:800;font-size:13px;flex-shrink:0;
+  box-shadow:inset 0 -4px 8px rgba(0,0,0,.4),inset 0 2px 4px rgba(255,255,255,.2),0 4px 10px rgba(0,0,0,.5);position:relative;}
+.chip::before{content:'';position:absolute;inset:6px;border-radius:50%;border:2px dashed rgba(255,255,255,.2);}
+.chip-white{background:radial-gradient(circle at 30% 30%,#ffffff,#d5d2c6);color:#222;}
+.chip-red{background:radial-gradient(circle at 30% 30%,#ff6170,#a20f24);color:#fff;}
+.chip-blue{background:radial-gradient(circle at 30% 30%,#3b8bff,#0a3a8c);color:#fff;}
+.chip-green{background:radial-gradient(circle at 30% 30%,#2fd490,#08613a);color:#fff;}
+.chip-black{background:radial-gradient(circle at 30% 30%,#4a4a52,#0b0b10);color:#fff;}
+.chip-info{flex:1;min-width:0;}
+.chip-name{font-family:"Bodoni Moda",serif;font-style:italic;font-weight:700;font-size:16px;color:var(--ink);}
+.chip-subtotal{font-family:"JetBrains Mono",monospace;font-size:11px;color:var(--gold-bright);font-weight:800;letter-spacing:.05em;margin-top:2px;}
+.counter{display:flex;align-items:center;gap:6px;flex-shrink:0;}
+.btn-qty{background:#2a2530;border:1px solid var(--line);color:#fff;width:34px;height:34px;border-radius:50%;
+  font-size:20px;font-weight:bold;cursor:pointer;display:flex;align-items:center;justify-content:center;user-select:none;transition:all .15s;}
+.btn-qty:active{transform:scale(.9);}
+.btn-qty.minus:hover{background:rgba(255,97,112,.2);border-color:var(--red);color:var(--red);}
+.btn-qty.plus:hover{background:rgba(142,240,181,.2);border-color:var(--green);color:var(--green);}
+.qty-input{width:56px;height:34px;background:#000;border:1px solid #444;color:#fff;font-family:"JetBrains Mono",monospace;
+  font-weight:800;font-size:18px;text-align:center;border-radius:6px;outline:none;-moz-appearance:textfield;}
+.qty-input::-webkit-outer-spin-button,.qty-input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
+.qty-input:focus{border-color:var(--gold);}
+.action-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px;}
+.btn-action{padding:14px;border-radius:10px;border:1px solid var(--line);font-family:"JetBrains Mono",monospace;font-weight:800;font-size:12px;letter-spacing:.1em;
+  background:rgba(0,0,0,.4);color:var(--ink);cursor:pointer;text-transform:uppercase;}
+.btn-action:hover{border-color:var(--gold-bright);color:var(--gold-bright);}
+.btn-save-snap{width:100%;padding:16px;border-radius:12px;background:linear-gradient(180deg,var(--gold-bright),var(--gold));color:#201703;
+  border:none;font-family:"JetBrains Mono",monospace;font-weight:800;font-size:13px;letter-spacing:.15em;cursor:pointer;margin-bottom:20px;
+  box-shadow:0 6px 20px rgba(212,175,55,.3);text-transform:uppercase;}
+.history-list{max-height:300px;overflow-y:auto;}
+.history-item{display:flex;justify-content:space-between;align-items:center;padding:10px 8px;border-bottom:1px solid rgba(255,255,255,.05);gap:10px;}
+.history-amount{font-family:"JetBrains Mono",monospace;font-weight:800;font-size:14px;}
+.history-amount.up{color:var(--green);}
+.history-amount.down{color:var(--red);}
+.history-amount.same{color:var(--gold-bright);}
+.history-meta{font-family:"JetBrains Mono",monospace;font-size:9px;color:var(--ink-dim);letter-spacing:.1em;margin-top:3px;}
+.empty-state{text-align:center;padding:20px;color:var(--ink-dim);font-style:italic;font-size:13px;}
+.sync-status{position:fixed;bottom:15px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.7);border:1px solid var(--line);
+  padding:6px 12px;border-radius:20px;font-family:"JetBrains Mono",monospace;font-size:9px;letter-spacing:.2em;color:var(--ink-dim);
+  text-transform:uppercase;backdrop-filter:blur(4px);}
+.sync-status.ok{color:var(--green);border-color:rgba(142,240,181,.3);}
+.sync-status.err{color:var(--red);border-color:rgba(255,97,112,.3);}
+@media (max-width:480px){.brand{font-size:30px;}.total-amount{font-size:48px;}.chip{width:40px;height:40px;font-size:12px;}.qty-input{width:48px;font-size:16px;}}
+</style></head>
+<body>
+<div class="container">
+  <header>
+    <a href="/" class="back-btn" data-i18n="common.back">← Retour</a>
+    <div class="brand">
+      <span data-i18n="coffre.title">Mon Coffre</span>
+      <small data-i18n="coffre.subtitle">Suivi personnel des jetons</small>
+    </div>
+  </header>
+
+  <div class="profile-box">
+    <input type="text" class="name-input" id="player-name" data-i18n-placeholder="coffre.name_ph" placeholder="Votre nom" maxlength="20">
+  </div>
+
+  <div class="total-box">
+    <div class="total-label" data-i18n="coffre.total">TOTAL EN MAIN</div>
+    <div class="total-amount" id="total">0</div>
+    <div class="total-count" id="total-count">0 jetons au total</div>
+  </div>
+
+  <div class="chips-section">
+    <div class="section-title" data-i18n="coffre.in_vault">◆ Dans votre coffre</div>
+
+    <div class="chip-row">
+      <div class="chip chip-white">5</div>
+      <div class="chip-info"><div class="chip-name" data-i18n="coffre.chip.white">Blancs</div><div class="chip-subtotal" id="sub-5">0 × 5 = 0</div></div>
+      <div class="counter">
+        <div class="btn-qty minus" onclick="adj(5,-1)">−</div>
+        <input type="number" class="qty-input" id="q-5" value="0" min="0" oninput="updateAll()">
+        <div class="btn-qty plus" onclick="adj(5,1)">+</div>
+      </div>
+    </div>
+
+    <div class="chip-row">
+      <div class="chip chip-red">10</div>
+      <div class="chip-info"><div class="chip-name" data-i18n="coffre.chip.red">Rouges</div><div class="chip-subtotal" id="sub-10">0 × 10 = 0</div></div>
+      <div class="counter">
+        <div class="btn-qty minus" onclick="adj(10,-1)">−</div>
+        <input type="number" class="qty-input" id="q-10" value="0" min="0" oninput="updateAll()">
+        <div class="btn-qty plus" onclick="adj(10,1)">+</div>
+      </div>
+    </div>
+
+    <div class="chip-row">
+      <div class="chip chip-blue">25</div>
+      <div class="chip-info"><div class="chip-name" data-i18n="coffre.chip.blue">Bleus</div><div class="chip-subtotal" id="sub-25">0 × 25 = 0</div></div>
+      <div class="counter">
+        <div class="btn-qty minus" onclick="adj(25,-1)">−</div>
+        <input type="number" class="qty-input" id="q-25" value="0" min="0" oninput="updateAll()">
+        <div class="btn-qty plus" onclick="adj(25,1)">+</div>
+      </div>
+    </div>
+
+    <div class="chip-row">
+      <div class="chip chip-green">50</div>
+      <div class="chip-info"><div class="chip-name" data-i18n="coffre.chip.green">Verts</div><div class="chip-subtotal" id="sub-50">0 × 50 = 0</div></div>
+      <div class="counter">
+        <div class="btn-qty minus" onclick="adj(50,-1)">−</div>
+        <input type="number" class="qty-input" id="q-50" value="0" min="0" oninput="updateAll()">
+        <div class="btn-qty plus" onclick="adj(50,1)">+</div>
+      </div>
+    </div>
+
+    <div class="chip-row">
+      <div class="chip chip-black">100</div>
+      <div class="chip-info"><div class="chip-name" data-i18n="coffre.chip.black">Noirs</div><div class="chip-subtotal" id="sub-100">0 × 100 = 0</div></div>
+      <div class="counter">
+        <div class="btn-qty minus" onclick="adj(100,-1)">−</div>
+        <input type="number" class="qty-input" id="q-100" value="0" min="0" oninput="updateAll()">
+        <div class="btn-qty plus" onclick="adj(100,1)">+</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="action-row">
+    <button class="btn-action" onclick="resetCounters()" data-i18n="coffre.reset">🔄 Reset</button>
+    <button class="btn-action" onclick="resetHistory()" data-i18n="coffre.clear_hist">🗑️ Effacer Historique</button>
+  </div>
+
+  <button class="btn-save-snap" onclick="saveSnapshot()" data-i18n="coffre.save_snap">📸 Enregistrer dans l'Historique</button>
+
+  <div class="chips-section">
+    <div class="section-title" data-i18n="coffre.history">📜 Historique</div>
+    <div class="history-list" id="history-list">
+      <div class="empty-state" data-i18n="coffre.empty_hist">Aucun enregistrement</div>
+    </div>
+  </div>
+</div>
+
+<div class="sync-status" id="sync-status" data-i18n="common.connecting">CONNEXION...</div>
+
+<script src="/i18n.js"></script>
+<script src="/lang-switcher.js"></script>
+<script>
+I18N.init();
+
+let deviceId = localStorage.getItem('coffre_device_id');
+if (!deviceId) {
+  deviceId = 'dev_' + Math.random().toString(36).substring(2,11) + Date.now().toString(36);
+  localStorage.setItem('coffre_device_id', deviceId);
+}
+
+const CHIPS = [5,10,25,50,100];
+const CHIP_KEYS = { 5:'coffre.chip.white', 10:'coffre.chip.red', 25:'coffre.chip.blue', 50:'coffre.chip.green', 100:'coffre.chip.black' };
+
+let myData = { name:'', chips:{5:0,10:0,25:0,50:0,100:0}, history:[] };
+let saveTimer = null;
+let lastTotal = 0;
+
+const $ = s => document.querySelector(s);
+
+async function loadFromServer() {
+  setSyncStatus(t('common.connecting'),'');
+  try {
+    const res = await fetch('/api/coffre/' + deviceId);
+    if (res.ok) {
+      const data = await res.json();
+      myData = {
+        name: data.name || '',
+        chips: data.chips || {5:0,10:0,25:0,50:0,100:0},
+        history: data.history || []
+      };
+      CHIPS.forEach(v => { if (myData.chips[v]===undefined) myData.chips[v]=0; });
+      render();
+      setSyncStatus(t('common.saved'),'ok');
+    } else if (res.status === 404) {
+      render();
+      setSyncStatus(t('common.saved'),'ok');
+    } else { setSyncStatus(t('common.error'),'err'); }
+  } catch {
+    setSyncStatus(t('common.offline'),'err');
+    const local = localStorage.getItem('coffre_data');
+    if (local) { try { myData = JSON.parse(local); render(); } catch{} }
+  }
+}
+function scheduleSave() {
+  clearTimeout(saveTimer);
+  setSyncStatus(t('common.saving'),'');
+  saveTimer = setTimeout(saveToServer, 600);
+}
+async function saveToServer() {
+  localStorage.setItem('coffre_data', JSON.stringify(myData));
+  try {
+    const res = await fetch('/api/coffre/' + deviceId, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify(myData)
+    });
+    if (res.ok) setSyncStatus(t('common.saved'),'ok');
+    else setSyncStatus(t('common.error'),'err');
+  } catch { setSyncStatus(t('common.offline'),'err'); }
+}
+function setSyncStatus(text, cls) {
+  const el = $('#sync-status');
+  el.textContent = text;
+  el.className = 'sync-status ' + (cls||'');
+}
+
+function adj(value, delta) {
+  const input = $('#q-' + value);
+  const newVal = Math.max(0, (parseInt(input.value)||0) + delta);
+  input.value = newVal;
+  myData.chips[value] = newVal;
+  updateAll();
+  if (navigator.vibrate) navigator.vibrate(8);
+}
+function updateAll() {
+  let total = 0, totalCount = 0;
+  CHIPS.forEach(v => {
+    const qty = Math.max(0, parseInt($('#q-' + v).value)||0);
+    myData.chips[v] = qty;
+    const sub = qty * v;
+    total += sub; totalCount += qty;
+    $('#sub-' + v).textContent = qty + ' × ' + v + ' = ' + sub;
+  });
+  const totalEl = $('#total');
+  totalEl.textContent = total.toLocaleString();
+  if (total !== lastTotal) {
+    totalEl.classList.remove('flash');
+    void totalEl.offsetWidth;
+    totalEl.classList.add('flash');
+    lastTotal = total;
+  }
+  const label = totalCount === 1 ? t('coffre.chip_count_one') : t('coffre.chip_count');
+  $('#total-count').textContent = totalCount + ' ' + label;
+  scheduleSave();
+}
+function resetCounters() {
+  if (!confirm(t('coffre.confirm_reset'))) return;
+  CHIPS.forEach(v => { $('#q-' + v).value = 0; myData.chips[v] = 0; });
+  updateAll();
+}
+function saveSnapshot() {
+  const total = CHIPS.reduce((s,v)=>s+(myData.chips[v]||0)*v, 0);
+  const breakdown = CHIPS.map(v=>{
+    const q = myData.chips[v]||0;
+    return q>0 ? q + ' ' + t(CHIP_KEYS[v]).toLowerCase() : null;
+  }).filter(Boolean).join(' · ') || '-';
+  const last = myData.history.length>0 ? myData.history[0].total : null;
+  let delta = null;
+  if (last !== null) delta = total - last;
+  myData.history.unshift({ total, breakdown, delta, chips:{...myData.chips}, date:Date.now() });
+  if (myData.history.length > 50) myData.history.length = 50;
+  render();
+  scheduleSave();
+  if (navigator.vibrate) navigator.vibrate([30,50,30]);
+}
+function resetHistory() {
+  if (!confirm(t('coffre.confirm_clear'))) return;
+  myData.history = [];
+  render();
+  scheduleSave();
+}
+function render() {
+  $('#player-name').value = myData.name || '';
+  CHIPS.forEach(v => { $('#q-' + v).value = myData.chips[v] || 0; });
+  updateAll();
+  const list = $('#history-list');
+  if (!myData.history || !myData.history.length) {
+    list.innerHTML = '<div class="empty-state">' + t('coffre.empty_hist') + '</div>';
+  } else {
+    const localeMap = { fr:'fr-FR', en:'en-US', pt:'pt-PT' };
+    const locale = localeMap[I18N.current] || 'fr-FR';
+    list.innerHTML = myData.history.map(h => {
+      const d = new Date(h.date);
+      const dateStr = d.toLocaleDateString(locale,{day:'2-digit',month:'short'}) + ' · ' + d.toLocaleTimeString(locale,{hour:'2-digit',minute:'2-digit'});
+      let deltaStr = '', deltaCls = 'same';
+      if (h.delta !== null && h.delta !== undefined) {
+        if (h.delta > 0) { deltaStr = ' (+' + h.delta + ')'; deltaCls = 'up'; }
+        else if (h.delta < 0) { deltaStr = ' (' + h.delta + ')'; deltaCls = 'down'; }
+      }
+      return `<div class="history-item">
+        <div style="flex:1;min-width:0;">
+          <div style="font-family:'JetBrains Mono';font-size:13px;">${escapeHtml(h.breakdown)}</div>
+          <div class="history-meta">${dateStr}</div>
+        </div>
+        <div class="history-amount ${deltaCls}">${h.total}${deltaStr}</div>
+      </div>`;
+    }).join('');
+  }
+}
+function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+
+$('#player-name').addEventListener('input', e => { myData.name = e.target.value.trim(); scheduleSave(); });
+CHIPS.forEach(v => {
+  $('#q-' + v).addEventListener('blur', e => {
+    if (!e.target.value || parseInt(e.target.value) < 0) { e.target.value = 0; updateAll(); }
+  });
+});
+
+document.addEventListener('langchange', () => { render(); });
+
+loadFromServer();
+</script>
+</body>
+</html>

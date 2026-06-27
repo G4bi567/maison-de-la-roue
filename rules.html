@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title data-i18n-doctitle="rules.title">Règles · Maison de la Roue</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,wght@0,700;0,900;1,700;1,900&family=JetBrains+Mono:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#06060a;--bg2:#0e0a14;--ink:#f5ead0;--ink-dim:#a99e86;--gold:#d4af37;--goldb:#f0cc5a;--line:rgba(212,175,55,.25);}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html,body{background:var(--bg);color:var(--ink);font-family:"Bodoni Moda",serif;min-height:100vh;}
+body{background:radial-gradient(900px 500px at 50% -10%,rgba(212,175,55,.16),transparent 70%),var(--bg);padding:30px 20px 60px;}
+.container{max-width:780px;margin:0 auto;}
+header{text-align:center;margin-bottom:30px;position:relative;}
+.back-btn{position:absolute;left:0;top:8px;background:rgba(0,0,0,.4);border:1px solid var(--line);color:var(--ink-dim);
+  padding:8px 14px;border-radius:8px;text-decoration:none;font-family:"JetBrains Mono",monospace;font-size:11px;font-weight:800;letter-spacing:.1em;}
+.back-btn:hover{color:var(--goldb);border-color:var(--gold);}
+.brand{font-weight:900;font-style:italic;font-size:42px;
+  background:linear-gradient(180deg,var(--goldb),var(--gold) 60%,#8a6e1c);-webkit-background-clip:text;background-clip:text;color:transparent;}
+.brand small{display:block;font-family:"JetBrains Mono",monospace;font-style:normal;font-weight:600;font-size:11px;letter-spacing:.3em;color:var(--ink-dim);margin-top:8px;text-transform:uppercase;}
+.intro{text-align:center;font-style:italic;color:var(--ink-dim);font-size:16px;margin-bottom:30px;}
+.rule-card{background:linear-gradient(180deg,rgba(255,255,255,.02),rgba(0,0,0,.3)),var(--bg2);border:1px solid var(--line);
+  border-radius:14px;padding:22px 24px;margin-bottom:16px;box-shadow:0 12px 30px -16px rgba(0,0,0,.7);}
+.rule-card h2{font-family:"Bodoni Moda",serif;font-style:italic;font-weight:900;font-size:28px;color:var(--goldb);margin-bottom:10px;}
+.rule-card p{font-size:15px;line-height:1.65;color:var(--ink);}
+.rule-card.liar{border-color:rgba(176,109,255,.4);}
+.rule-card.liar h2{color:#b06dff;}
+@media (max-width:600px){.brand{font-size:32px;}.rule-card h2{font-size:22px;}}
+</style></head>
+<body>
+<div class="container">
+  <header>
+    <a href="/" class="back-btn" data-i18n="common.back">← Retour</a>
+    <div class="brand">
+      <span data-i18n="rules.title">Règles des Jeux</span>
+      <small data-i18n="brand.table">Table № 1</small>
+    </div>
+  </header>
+  <p class="intro" data-i18n="rules.intro">Un récapitulatif rapide des jeux ce soir.</p>
+
+  <div class="rule-card"><h2 data-i18n="rules.roulette.h">🎰 Roulette</h2><p data-i18n="rules.roulette.b"></p></div>
+  <div class="rule-card"><h2 data-i18n="rules.blackjack.h">🃏 Blackjack</h2><p data-i18n="rules.blackjack.b"></p></div>
+  <div class="rule-card"><h2 data-i18n="rules.poker.h">♠ Poker</h2><p data-i18n="rules.poker.b"></p></div>
+  <div class="rule-card liar"><h2 data-i18n="rules.liar.h">🔫 Liar's Bar</h2><p data-i18n="rules.liar.b"></p></div>
+</div>
+
+<script src="/i18n.js"></script>
+<script src="/lang-switcher.js"></script>
+<script>I18N.init();</script>
+</body>
+</html>

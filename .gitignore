@@ -1,0 +1,4 @@
+node_modules/
+coffres.json
+.DS_Store
+*.log
