@@ -235,17 +235,23 @@ let liarSelectedCount = 1;
 
 // ============== AVATAR PICKER ==============
 const AVATARS = ['🦊','🐺','🦁','🐻','🦅','🐯','🐸','🦝','🐼','🐨','🦄','🐲','🦉','🦂','🐧','🦋','👑','🎩','🃏','💀','🍀','⚜️'];
-let chosenAvatar = localStorage.getItem('player_avatar') || '🎩';
+let chosenAvatar = localStorage.getItem('player_avatar') || '🦊';
 function renderAvatarPicker() {
-  const wrap = $('#avatar-picker'); if (!wrap) return;
-  wrap.innerHTML = AVATARS.map(a => `<button type="button" data-av="${a}" style="font-size:24px;padding:8px 0;background:${a===chosenAvatar?'rgba(212,175,55,.25)':'rgba(0,0,0,.4)'};border:1px solid ${a===chosenAvatar?'var(--gold)':'var(--line)'};border-radius:6px;cursor:pointer;color:#fff">${a}</button>`).join('');
+  const wrap = document.getElementById('avatar-picker'); if (!wrap) return;
+  wrap.innerHTML = AVATARS.map(a => {
+    const sel = a === chosenAvatar;
+    return '<button type="button" data-av="' + a + '" style="font-size:26px;line-height:1;padding:10px 0;background:' + (sel?'rgba(212,175,55,.3)':'rgba(255,255,255,.05)') + ';border:2px solid ' + (sel?'#d4af37':'rgba(212,175,55,.25)') + ';border-radius:8px;cursor:pointer;color:#fff">' + a + '</button>';
+  }).join('');
   wrap.querySelectorAll('button').forEach(b => b.addEventListener('click', () => {
     chosenAvatar = b.dataset.av;
     localStorage.setItem('player_avatar', chosenAvatar);
     renderAvatarPicker();
   }));
 }
+// Render now and also after full load (belt and suspenders)
 renderAvatarPicker();
+window.addEventListener('load', renderAvatarPicker);
+window.addEventListener('langchange', renderAvatarPicker);
 
 // ============== BUZZ (vibration) ==============
 function buzz(ms) { try { if (navigator.vibrate) navigator.vibrate(ms || 200); } catch(e){} }
@@ -730,7 +736,6 @@ function renderPlayerList() {
       <span class="dot" style="background:${p.color};color:${p.color}"></span>
       <div style="flex:1">${escapeHtml(p.name)}${elim?' 💀':''}</div>
       <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#ff6170">🔫 1/${chambers}</div>
-    </div>`;
     </div>`;
   }).join('');
   return `<div style="margin-top:14px;"><div class="section-title">${t('disp.players_at')}</div><div class="loser-list">${items}</div></div>`;
