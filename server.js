@@ -58,7 +58,7 @@ function survivedRevolver(rev) {
   return { chambers, bulletIdx: Math.floor(Math.random() * chambers) };
 }
 
-const RANKS = ['♠ Pique', '♣ Trèfle', '♥ Cœur', '♦ Carreau'];
+const RANKS = ['♠ Spades', '♣ Clubs', '♥ Hearts', '♦ Diamonds'];
 const RANK_NAMES = { '🔴 Rouge': 'Rouge', '⚫ Noir': 'Noir' };
 
 // ═══════════════════════════════════════════════════════════════════

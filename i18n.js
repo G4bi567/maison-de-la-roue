@@ -289,10 +289,10 @@ const TRANSLATIONS = {
                           pt:'Último sobrevivente vence 🏆' },
 
   // gameplay UI
-  'liar.current_rank':  { fr:'Couleur à jouer',    en:'Color to play',    pt:'Cor a jogar' },
+  'liar.current_rank':  { fr:'Couleur à jouer',      en:'Suit to play',     pt:'Naipe a jogar' },
   'liar.turn':          { fr:'À jouer',            en:"Whose turn",       pt:'Vez de' },
   'liar.your_turn':        { fr:'C\'est ton tour !',   en:'Your turn!',         pt:'É a tua vez!' },
-  'liar.card_to_play':  { fr:'Couleur à jouer',    en:'Suit to play',     pt:'Naipe a jogar' },
+  'liar.card_to_play':  { fr:'Couleur à jouer',      en:'Suit to play',     pt:'Naipe a jogar' },
   'liar.chambers_left': { fr:'chambres restantes', en:'chambers left',    pt:'câmaras restantes' },
   'liar.flip_cards':    { fr:'RETOURNEZ LES CARTES', en:'FLIP THE CARDS', pt:'VIRE AS CARTAS' },
   'liar.accused':       { fr:'a accusé',            en:'accused',         pt:'acusou' },
@@ -336,7 +336,7 @@ const TRANSLATIONS = {
   'liar.confirm_reset': { fr:'Démarrer une nouvelle partie ?', en:'Start a new game?', pt:'Começar um novo jogo?' },
 
   // log lines (server uses keys with placeholders)
-  'liar.log.start':     { fr:'Partie démarrée ! Symbole : %R%', en:'Game started! Suit: %R%', pt:'Jogo começou! Naipe: %R%' },
+  'liar.log.start':     { fr:'Partie démarrée ! Couleur : %R%', en:'Game started! Suit: %R%', pt:'Jogo começou! Naipe: %R%' },
   'liar.log.played':    { fr:'%P% a joué ses cartes', en:'%P% played their cards', pt:'%P% jogou as cartas' },
   'liar.log.play':      { fr:'%P% joue %N% carte(s) — annonce %N%× %R%', en:'%P% plays %N% card(s) — claims %N%× %R%', pt:'%P% joga %N% carta(s) — declara %N%× %R%' },
   'liar.log.believe':   { fr:'%P% croit — au tour suivant !', en:'%P% believes — next turn!', pt:'%P% acredita — próxima vez!' },

@@ -655,11 +655,6 @@ function renderLiar() {
   // PLAYING phase — just card type + chambers + LIAR buttons
   if (phase === 'playing') {
     const alive = Object.entries(s.players).filter(([,p]) => !p.eliminated);
-    // Suit color
-    const isRed = s.currentRank && (s.currentRank.includes('♥') || s.currentRank.includes('♦'));
-    const suitColor = isRed ? '#ff4060' : '#f5ead0';
-    const suitGlow  = isRed ? 'rgba(255,64,96,.6)' : 'rgba(245,234,208,.4)';
-
     // VERDICT SCREEN — someone called LIAR, flip cards, who was wrong?
     if (s.needLoserPick && s.liarpick) {
       const lp = s.liarpick;
@@ -695,7 +690,10 @@ function renderLiar() {
     c.innerHTML = `
       <div style="text-align:center;padding:18px 0 20px;border-bottom:1px solid var(--line);margin-bottom:18px">
         <div style="font-size:11px;font-family:'JetBrains Mono',monospace;letter-spacing:.5em;color:var(--ink-dim);text-transform:uppercase;margin-bottom:10px">${t('liar.card_to_play')}</div>
-        <div style="font-size:52px;font-weight:900;font-style:italic;line-height:1;color:${suitColor};text-shadow:0 0 30px ${suitGlow}">${s.currentRank || '—'}</div>
+        <div style="font-size:52px;font-weight:900;font-style:italic;line-height:1;
+          color:${s.currentRank && (s.currentRank.includes('Hearts') || s.currentRank.includes('Diamonds')) ? '#ff4060' : '#f5ead0'};
+          text-shadow:0 0 30px ${s.currentRank && (s.currentRank.includes('Hearts') || s.currentRank.includes('Diamonds')) ? 'rgba(255,64,96,.6)' : 'rgba(245,234,208,.4)'}">
+          ${s.currentRank || '—'}</div>
         <div style="font-family:'JetBrains Mono',monospace;font-size:14px;color:#ff6170;margin-top:12px;letter-spacing:.3em">🔫 ${(me && me.revolver ? me.revolver.chambers : 6)} ${t('liar.chambers_left')}</div>
       </div>
       <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:14px">
